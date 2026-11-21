@@ -45,26 +45,28 @@
       background-size: 32px 32px, 128px 128px, 128px 128px;
     }
 
-    /* Smooth Lift & Glow on Hover */
+    /* Smooth Lift & Glow on Hover - Hover capable devices only */
     .sheet-box {
       transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .sheet-box:hover {
-      transform: translateY(-5px);
+    @media (hover: hover) {
+      .sheet-box:hover {
+        transform: translateY(-5px);
+      }
     }
   </style>
 </head>
-<body class="antialiased selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col justify-start sm:justify-center py-8 sm:py-14 px-4 sm:px-6 lg:px-8 relative bg-dev-pattern">
+<body class="antialiased selection:bg-indigo-500 selection:text-white min-h-[100dvh] flex flex-col justify-start sm:justify-center py-8 sm:py-14 px-4 sm:px-6 lg:px-8 relative bg-dev-pattern">
 
   <!-- ========================================================================= -->
   <!-- DEVELOPER GRAPHICS & AMBIENT GRAFFITI BACKGROUND (Non-intrusive, subtle) -->
   <!-- ========================================================================= -->
   <div class="fixed inset-0 pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
     
-    <!-- Ambient Radial Glow Beacons -->
-    <div class="absolute -top-32 -left-20 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
-    <div class="absolute top-20 -right-24 w-[650px] h-[650px] bg-cyan-500/10 rounded-full blur-[130px]"></div>
-    <div class="absolute -bottom-40 left-1/3 w-[700px] h-[700px] bg-purple-600/8 rounded-full blur-[140px]"></div>
+    <!-- Ambient Radial Glow Beacons (optimized blur for mobile GPUs) -->
+    <div class="absolute -top-32 -left-20 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[70px] sm:blur-[120px]"></div>
+    <div class="absolute top-20 -right-24 w-[550px] h-[550px] bg-cyan-500/10 rounded-full blur-[75px] sm:blur-[130px]"></div>
+    <div class="absolute -bottom-40 left-1/3 w-[600px] h-[600px] bg-purple-600/8 rounded-full blur-[80px] sm:blur-[140px]"></div>
 
     <!-- Decorative Developer SVG Watermarks & Circuits -->
     <svg class="absolute inset-0 w-full h-full opacity-35" xmlns="http://www.w3.org/2000/svg">
@@ -73,10 +75,6 @@
         <pattern id="crosshair-grid" width="128" height="128" patternUnits="userSpaceOnUse">
           <path d="M64 60v8M60 64h8" stroke="rgba(255,255,255,0.08)" stroke-width="1.2" />
         </pattern>
-        <linearGradient id="line-grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
-          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
-        </linearGradient>
         <linearGradient id="line-grad-indigo" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#818cf8" stop-opacity="0.3" />
           <stop offset="100%" stop-color="#818cf8" stop-opacity="0" />
@@ -93,13 +91,21 @@
         <circle cx="140" cy="220" r="3" fill="#818cf8" fill-opacity="0.4" />
         <circle cx="110" cy="360" r="3" fill="#818cf8" fill-opacity="0.4" />
       </g>
+    </svg>
 
-      <!-- Right Circuit Wireframe / Distributed Nodes -->
+    <!-- Right Circuit Wireframe / Distributed Nodes (Clean Fixed-Pixel ViewBox SVG) -->
+    <svg class="absolute right-0 top-60 w-60 h-80 opacity-35 hidden sm:block pointer-events-none" viewBox="0 0 240 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="line-grad-cyan" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3" />
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+        </linearGradient>
+      </defs>
       <g stroke="url(#line-grad-cyan)" stroke-width="1.2" fill="none">
-        <path d="M100% 280 h-140 l-50 50 v140 l40 40 h170" />
-        <circle cx="calc(100% - 140px)" cy="280" r="3" fill="#38bdf8" fill-opacity="0.4" />
-        <circle cx="calc(100% - 190px)" cy="330" r="3" fill="#38bdf8" fill-opacity="0.4" />
-        <circle cx="calc(100% - 150px)" cy="510" r="3" fill="#38bdf8" fill-opacity="0.4" />
+        <path d="M240 20 h-120 l-40 40 v120 l30 30 h110" />
+        <circle cx="120" cy="20" r="3" fill="#38bdf8" fill-opacity="0.4" />
+        <circle cx="80" cy="60" r="3" fill="#38bdf8" fill-opacity="0.4" />
+        <circle cx="110" cy="210" r="3" fill="#38bdf8" fill-opacity="0.4" />
       </g>
     </svg>
 
