@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python OOP — Complete Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a0e14;
+      --bg-surface: #111722;
+      --bg-row-alt: rgba(255, 255, 255, 0.016);
+      --bg-row-hover: rgba(255, 255, 255, 0.042);
+      --bg-code: #0b0f17;
+      --border: #1e293b;
+      --border-strong: #2d3c54;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #8b9bb4;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --syn-kw: #c084fc;
+      --syn-str: #86efac;
+      --syn-num: #fbbf24;
+      --syn-fn: #60a5fa;
+      --syn-cm: #64748b;
+      --syn-cls: #38bdf8;
+      --syn-dec: #f472b6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background:
+        radial-gradient(1100px 420px at 85% -10%, rgba(56, 189, 248, 0.07), transparent 65%),
+        radial-gradient(900px 380px at 10% 0%, rgba(167, 139, 250, 0.05), transparent 65%),
+        var(--bg-base);
+      min-height: 100vh;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 9px; height: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: #26344b; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #364969; }
+
+    /* Ultra-Slim Single-Row Frozen Top Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 6px clamp(14px, 2.2vw, 36px);
+      background: rgba(10, 14, 20, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar::-webkit-scrollbar { display: none; }
+
+    .top-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .top-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11.8px;
+      font-weight: 500;
+      line-height: 1.25;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+      background: #172030;
+    }
+
+    .pill.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--pill-accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--pill-accent) 28%, transparent);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pill-accent);
+    }
+
+    /* Main Container */
+    .page {
+      width: 100%;
+      padding: 20px clamp(16px, 2.4vw, 40px) 76px;
+    }
+
+    /* Sections */
+    .oop-section {
+      width: 100%;
+      margin-bottom: 62px;
+      scroll-margin-top: 48px;
+    }
+    .oop-section:last-child { margin-bottom: 0; }
+    .oop-section.is-hidden { display: none; }
+
+    .sec-header {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 4px 10px;
+      border-radius: 7px;
+    }
+
+    .sec-header h2 {
+      font-size: 25px;
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      color: #fff;
+    }
+
+    .sec-tag {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--sec-accent);
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      padding: 4px 11px;
+      border-radius: 7px;
+    }
+
+    /* Topic Subgroups */
+    .subgroup {
+      margin-bottom: 36px;
+      width: 100%;
+    }
+    .subgroup:last-child { margin-bottom: 0; }
+
+    .subgroup-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .subgroup h3 {
+      font-size: 17.5px;
+      font-weight: 680;
+      color: #fff;
+      letter-spacing: -0.015em;
+    }
+
+    .sub-pill {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 2px 9px;
+      border-radius: 5px;
+    }
+
+    .added-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      padding: 2px 8px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    .fix-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      padding: 2px 8px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    /* Readable Lead Explanation */
+    .lead {
+      font-size: 14.5px;
+      line-height: 1.72;
+      color: var(--text-secondary);
+      max-width: 96ch;
+      margin-bottom: 15px;
+    }
+    .lead strong { color: #fff; font-weight: 600; }
+    .lead code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / Analogy Strip */
+    .callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border-radius: var(--radius-md);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .callout.warn {
+      background: rgba(251, 191, 36, 0.08);
+      border-color: rgba(251, 191, 36, 0.28);
+    }
+    .callout.warn .callout-tag { color: #fbbf24; }
+
+    .callout-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--sec-accent);
+      background: rgba(10, 14, 20, 0.78);
+      padding: 3px 8px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .callout strong { color: #fff; font-weight: 600; }
+    .callout code {
+      font-family: var(--font-mono);
+      font-size: 12.8px;
+      color: #e2e8f0;
+      background: rgba(10, 14, 20, 0.6);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* Numbered Step Flow */
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      color: var(--sec-accent);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .step-title { font-size: 14px; font-weight: 650; color: #fff; line-height: 1.35; }
+    .step-desc { font-size: 13.4px; color: var(--text-secondary); line-height: 1.58; }
+    .step-desc strong { color: #fff; font-weight: 600; }
+    .step-desc code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Explanatory Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .concept-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 17px 19px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.15s ease;
+    }
+    .concept-card:hover { border-color: var(--border-strong); }
+    .concept-card.accent-left { border-left: 3px solid var(--sec-accent); }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 680;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 11.2px;
+      font-weight: 600;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 2px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .card-p {
+      font-size: 13.9px;
+      line-height: 1.66;
+      color: var(--text-secondary);
+    }
+    .card-p strong { color: #fff; font-weight: 600; }
+    .card-p code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13.9px;
+      line-height: 1.62;
+      color: var(--text-secondary);
+    }
+    .card-list li {
+      position: relative;
+      padding-left: 15px;
+    }
+    .card-list li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--sec-accent);
+      font-weight: 700;
+    }
+    .card-list strong { color: #fff; font-weight: 600; }
+    .card-list code {
+      font-family: var(--font-mono);
+      font-size: 12.4px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .card-foot {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(30, 41, 59, 0.85);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+    .card-foot strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* Code Cards (directly matching libraries.html) */
+    .code-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .code-card {
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--sec-accent);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      margin-bottom: 16px;
+    }
+    .code-grid .code-card { margin-bottom: 0; }
+
+    .code-card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.028);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots span { width: 9px; height: 9px; border-radius: 50%; }
+    .window-dots span:nth-child(1) { background: #ef4444; opacity: 0.78; }
+    .window-dots span:nth-child(2) { background: #f59e0b; opacity: 0.78; }
+    .window-dots span:nth-child(3) { background: #10b981; opacity: 0.78; }
+
+    .code-card-title {
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      margin-left: auto;
+      font-family: var(--font-sans);
+      font-size: 11.8px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-strong);
+      padding: 3px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { color: #fff; border-color: #64748b; background: rgba(255, 255, 255, 0.1); }
+    .copy-btn.copied { color: #4ade80; border-color: rgba(74, 222, 128, 0.45); background: rgba(74, 222, 128, 0.12); }
+
+    .code-pre {
+      padding: 14px 17px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13.4px;
+      line-height: 1.64;
+      color: #e2e8f0;
+    }
+
+    /* Tables */
+    .table-card {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      margin-bottom: 16px;
+    }
+    .table-card:last-child { margin-bottom: 0; }
+
+    .ops-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      table-layout: auto;
+    }
+
+    .ops-table thead th {
+      font-size: 11.4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.025);
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .op-row {
+      border-bottom: 1px solid rgba(30, 41, 59, 0.75);
+      transition: background 0.12s ease;
+    }
+    .op-row:nth-child(even) { background: var(--bg-row-alt); }
+    .op-row:last-child { border-bottom: none; }
+    .op-row:hover { background: var(--bg-row-hover); }
+
+    .ops-table td {
+      padding: 13px 16px;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.62;
+      color: var(--text-secondary);
+    }
+    .ops-table td strong { color: #fff; font-weight: 600; }
+    .ops-table td code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .col-key {
+      width: 19%;
+      white-space: nowrap;
+    }
+
+    .fn-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12.8px;
+      font-weight: 600;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .good-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.24);
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      color: #a7f3d0;
+      margin-bottom: 4px;
+    }
+
+    .warn-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: rgba(244, 63, 94, 0.09);
+      border: 1px solid rgba(244, 63, 94, 0.26);
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      color: #fda4af;
+      margin-bottom: 4px;
+    }
+
+    /* Diagram / UML Strip */
+    .arch-box {
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--sec-accent);
+      border-radius: var(--radius-md);
+      padding: 15px 18px;
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      line-height: 1.72;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin-bottom: 16px;
+      white-space: pre;
+    }
+    .arch-box .dim { color: var(--text-muted); }
+    .arch-box .hi { color: var(--sec-accent); font-weight: 600; }
+    .arch-box .ok { color: #86efac; }
+    .arch-box .warn { color: #fbbf24; }
+
+    /* Syntax Tokens */
+    .tok-kw { color: var(--syn-kw); }
+    .tok-str { color: var(--syn-str); }
+    .tok-num { color: var(--syn-num); }
+    .tok-fn { color: var(--syn-fn); }
+    .tok-cm { color: var(--syn-cm); font-style: italic; }
+    .tok-cls { color: var(--syn-cls); }
+    .tok-dec { color: var(--syn-dec); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 24px;
+      background: #162033;
+      color: #e2e8f0;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      padding: 8px 15px;
+      border-radius: 99px;
+      font-size: 12.8px;
+      font-weight: 500;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.18s ease;
+      z-index: 60;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1080px) {
+      .card-grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 820px) {
+      .code-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding: 6px 12px; gap: 8px; }
+      .page { padding: 16px 12px 56px; }
+      .card-grid.cols-2, .card-grid.cols-3 { grid-template-columns: 1fr; }
+      .col-key { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="index.html" class="pill" style="padding: 4px 10px; font-size: 11px; text-decoration: none; border-color: rgba(255,255,255,0.14);" title="Back to Index Hub">
+      ← Hub
+    </a>
+    <h1 class="top-title">Python OOP</h1>
+    <span class="top-divider" aria-hidden="true"></span>
+    <nav class="filter-pills" id="filterPills" aria-label="Filter sections">
+      <button class="pill active" data-filter="all" style="--pill-accent:#e2e8f0">All</button>
+      <button class="pill" data-filter="foundations" style="--pill-accent:#38bdf8"><span class="pill-dot"></span>Foundations</button>
+      <button class="pill" data-filter="mechanics" style="--pill-accent:#a78bfa"><span class="pill-dot"></span>Constructor &amp; Magic</button>
+      <button class="pill" data-filter="encapsulation" style="--pill-accent:#34d399"><span class="pill-dot"></span>Encapsulation</button>
+      <button class="pill" data-filter="memory" style="--pill-accent:#fb923c"><span class="pill-dot"></span>Objects &amp; Static</button>
+      <button class="pill" data-filter="relationships" style="--pill-accent:#f43f5e"><span class="pill-dot"></span>Inheritance</button>
+      <button class="pill" data-filter="polymorphism" style="--pill-accent:#fbbf24"><span class="pill-dot"></span>Polymorphism</button>
+      <button class="pill" data-filter="abstraction" style="--pill-accent:#2dd4bf"><span class="pill-dot"></span>Abstraction &amp; Recap</button>
+    </nav>
+  </header>
+
+  <main class="page">
+
+    <!-- ==================== 01 FOUNDATIONS ==================== -->
+    <section class="oop-section" id="foundations" data-sec="foundations" style="--sec-accent:#38bdf8;--sec-soft:rgba(56, 189, 248, 0.11);--sec-border:rgba(56, 189, 248, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">01</span>
+        <h2>Foundations — Why OOP, Classes &amp; Objects</h2>
+        <span class="sec-tag">Generality → Specificity · Blueprint · Method vs Function</span>
+      </header>
+
+      <div class="callout">
+        <span class="callout-tag">The One-Line Idea</span>
+        <div><strong>OOP lets you invent your own custom data types.</strong> You <em>could</em> build LinkedIn, OYO, or Ola using only generic lists, dicts, and strings — just like you could do security testing on plain Windows. But OOP moves you from <strong>generality to specificity</strong> (like using Kali Linux for security): you create dedicated types like <code>User</code>, <code>Atm</code>, or <code>Train</code> that mirror the real world and keep large codebases clean and easy to extend.</div>
+      </div>
+
+      <!-- Everything is an object -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>In Python, Everything Is an Object</h3>
+          <span class="sub-pill">Data Type = Class · Variable = Object</span>
+        </div>
+        <p class="lead">
+          Try calling <code>[1, 2, 3].upper()</code> or <code>"hello".append(4)</code> in Python and look closely at the error: <code>'list' object has no attribute 'upper'</code> and <code>'str' object has no attribute 'append'</code>. Even integers, lists, strings, and functions are <strong>objects</strong> created from built-in <strong>classes</strong> (<code>type(5)</code> prints <code>&lt;class 'int'&gt;</code>). Python simply gives built-in types shortcut syntax called <strong>object literals</strong> (<code>L = [1, 2]</code> instead of <code>L = list([1, 2])</code>) so writing everyday code feels effortless.
+        </p>
+
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Class = Blueprint · Object = Real Instance</span><span class="card-badge">1 Class → Many Objects</span></div>
+            <p class="card-p">A <strong>class</strong> defines the rules for how an object will look and behave — writing the class takes the real design effort. An <strong>object</strong> is a concrete instance built from that blueprint (just one line: <code>sbi = Atm()</code>).</p>
+            <ul class="card-list">
+              <li><strong>Data (Attributes / Properties):</strong> What the object <em>has</em> (nouns) — e.g., a <code>Car</code> has <code>color</code>, <code>engine</code>, <code>mileage</code>; an <code>Atm</code> has <code>pin</code> and <code>balance</code>.</li>
+              <li><strong>Behavior (Methods):</strong> What the object <em>does</em> (verbs) — e.g., <code>calculate_speed()</code>, <code>deposit()</code>, <code>withdraw()</code>.</li>
+              <li><strong>Naming Rules (PEP 8):</strong> Classes use <code>PascalCase</code> (<code>BankAccount</code>); variables &amp; methods use <code>snake_case</code> (<code>check_balance</code>).</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Function vs. Method &amp; UML Box</span><span class="card-badge">Interview Favorite</span></div>
+            <p class="card-p">Why do we write <code>len(L)</code> for length, but <code>L.append(5)</code> to add an item? Because <strong><code>len()</code> is a standalone function</strong> usable on many types, whereas <strong><code>append()</code> is a method</strong> defined <em>inside</em> the <code>list</code> class — only a list object can call it.</p>
+            <div class="arch-box" style="margin-bottom:0"><span class="hi">+-----------------------------+</span>
+|            <span class="hi">Car</span>              |  <span class="dim">← Class Name (PascalCase)</span>
+<span class="hi">+-----------------------------+</span>
+| <span class="ok">+</span> color                     |  <span class="dim">← + Public (accessible outside)</span>
+| <span class="warn">-</span> engine_serial             |  <span class="dim">← - Private (hidden inside)</span>
+<span class="hi">+-----------------------------+</span>
+| <span class="ok">+</span> calc_average_speed()      |  <span class="dim">← Methods (snake_case)</span>
+| <span class="warn">-</span> internal_diagnostics()    |
+<span class="hi">+-----------------------------+</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The 6 Pillars Overview -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>The 6 Building Blocks of OOP</h3>
+        </div>
+        <div class="flow-steps">
+          <div class="step-card"><span class="step-num">1</span><div class="step-meta"><span class="step-title">Class</span><span class="step-desc">The blueprint bundling data and methods into a custom type.</span></div></div>
+          <div class="step-card"><span class="step-num">2</span><div class="step-meta"><span class="step-title">Object</span><span class="step-desc">A live instance of a class with its own memory and attribute values.</span></div></div>
+          <div class="step-card"><span class="step-num">3</span><div class="step-meta"><span class="step-title">Encapsulation</span><span class="step-desc">Protecting internal data and controlling changes via methods/properties.</span></div></div>
+          <div class="step-card"><span class="step-num">4</span><div class="step-meta"><span class="step-title">Inheritance</span><span class="step-desc">Reusing and extending a parent class's code inside child classes.</span></div></div>
+          <div class="step-card"><span class="step-num">5</span><div class="step-meta"><span class="step-title">Polymorphism</span><span class="step-desc">Same interface or operator behaving differently for different types.</span></div></div>
+          <div class="step-card"><span class="step-num">6</span><div class="step-meta"><span class="step-title">Abstraction</span><span class="step-desc">Hiding implementation clutter behind a clean, enforced contract.</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 02 CONSTRUCTOR, SELF & MAGIC METHODS ==================== -->
+    <section class="oop-section" id="mechanics" data-sec="mechanics" style="--sec-accent:#a78bfa;--sec-soft:rgba(167, 139, 250, 0.11);--sec-border:rgba(167, 139, 250, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">02</span>
+        <h2>Constructor, <code>self</code> &amp; Magic Methods</h2>
+        <span class="sec-tag">__init__ · Why self Exists · Dunder Methods · Fraction Class</span>
+      </header>
+
+      <!-- Constructor & Self -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Constructor (<code>__init__</code>) &amp; Why <code>self</code> Exists</h3>
+          <span class="sub-pill">The two biggest beginner stumbling blocks, simplified</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">What Is <code>__init__</code> Really For?</span><span class="card-badge">Auto-Runs on Creation</span></div>
+            <p class="card-p"><code>__init__</code> is Python's constructor — a special method that runs <strong>automatically the instant you create an object</strong> (<code>sbi = Atm()</code>). Unlike Java/C++, its name is always <code>__init__</code>, never the class name.</p>
+            <p class="card-p"><strong>Why does it exist?</strong> It runs essential setup code you <em>never</em> want to leave up to the user clicking a button — initializing attributes, connecting to a database, loading config, or opening a network session. (In the lecture's philosophical analogy: if God wrote the <code>Human</code> class, breathing is a method you control, while mortality sits inside <code>__init__</code> — set automatically the moment an object is born.)</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Demystifying <code>self</code></span><span class="card-badge">self = Current Object</span></div>
+            <p class="card-p">If you print <code>id(self)</code> inside <code>Atm</code> and then print <code>id(sbi)</code> outside, <strong>both memory addresses are identical</strong>. When you create <code>hdfc = Atm()</code>, <code>self</code> points to <code>hdfc</code>. So <code>self</code> is simply whichever object is currently calling the method.</p>
+            <ul class="card-list">
+              <li><strong>Why pass <code>self</code> to every method?</strong> Because Python enforces a golden rule: <strong>only an object can access a class's data and other methods</strong> — even one method inside the class cannot call another method directly without <code>self</code>!</li>
+              <li>When you run <code>sbi.deposit()</code>, Python silently translates it into <code>Atm.deposit(sbi)</code>. Forgetting <code>self</code> raises: <code>takes 0 positional arguments but 1 was given</code>.</li>
+            </ul>
+            <div class="card-foot"><strong>Fun fact:</strong> <code>self</code> is a convention, not a keyword — you could name it <code>this</code> or <code>me</code>, though every Python developer uses <code>self</code>.</div>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">atm_basic.py — Class, Constructor &amp; Independent Object State</span><button class="copy-btn">Copy</button></div>
+          <pre class="code-pre"><code class="py-hl">class Atm:
+    def __init__(self, pin, balance=0):
+        # Instance variables live inside each object independently
+        self.pin = pin
+        self.balance = balance
+
+    def deposit(self, pin, amount):
+        if pin == self.pin:
+            self.balance += amount
+            print(f"Deposited ₹{amount}. New balance: ₹{self.balance}")
+        else:
+            print("Invalid PIN")
+
+    def withdraw(self, pin, amount):
+        if pin != self.pin:
+            print("Invalid PIN")
+        elif amount &gt; self.balance:
+            print("Insufficient funds")
+        else:
+            self.balance -= amount
+            print(f"Withdrew ₹{amount}. Remaining: ₹{self.balance}")
+
+sbi  = Atm("1234", 5000)   # self refers to sbi
+hdfc = Atm("9999", 100000) # self refers to hdfc (completely separate state!)
+sbi.withdraw("1234", 2000) # Remaining: ₹3000; hdfc is still ₹100000</code></pre>
+        </div>
+      </div>
+
+      <!-- Magic Methods & Fraction -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Magic (Dunder) Methods — Teaching Python How Your Type Works</h3>
+          <span class="sub-pill">Dunder = Double Underscore (<code>__name__</code>)</span>
+          <span class="fix-pill">Enhanced: Chaining Fixed</span>
+        </div>
+        <p class="lead">
+          <strong>Magic methods</strong> are predefined methods surrounded by double underscores (like <code>__init__</code>, <code>__str__</code>, <code>__add__</code>). You don't call them directly — Python triggers them automatically on specific events, letting your custom objects behave seamlessly like built-in types (printable with <code>print()</code>, addable with <code>+</code>, measurable with <code>len()</code>).
+        </p>
+
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Magic Method</th><th>Triggered Automatically When...</th><th>Example Use</th></tr></thead>
+            <tbody>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">__init__</span></td><td>An object is created: <code>obj = MyClass()</code></td><td>Initialize instance attributes &amp; setup resources.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">__str__</span></td><td>You call <code>print(obj)</code> or <code>str(obj)</code></td><td>Return a clean human-readable string (e.g., <code>"3/4"</code> instead of memory address).</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">__add__ / __sub__</span></td><td>You write <code>x + y</code> or <code>x - y</code></td><td>Define custom addition/subtraction between two objects.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">__mul__ / __truediv__</span></td><td>You write <code>x * y</code> or <code>x / y</code></td><td>Define custom multiplication and division.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">__eq__ / __lt__</span></td><td>You write <code>x == y</code> or <code>x &lt; y</code></td><td>Compare custom objects by value instead of memory identity.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">fraction.py — Building a Custom Data Type (Returns Fraction for Chaining)</span><button class="copy-btn">Copy</button></div>
+          <pre class="code-pre"><code class="py-hl">from math import gcd
+
+class Fraction:
+    def __init__(self, num, den):
+        if den == 0:
+            raise ValueError("Denominator cannot be zero")
+        common = gcd(num, den)
+        self.num = num // common
+        self.den = den // common
+
+    def __str__(self):
+        return f"{self.num}/{self.den}"
+
+    def __add__(self, other):
+        # Return a new Fraction (not a string!) so x + y + z chaining works
+        return Fraction(self.num * other.den + other.num * self.den, self.den * other.den)
+
+    def __sub__(self, other):
+        return Fraction(self.num * other.den - other.num * self.den, self.den * other.den)
+
+    def __mul__(self, other):
+        return Fraction(self.num * other.num, self.den * other.den)
+
+    def __truediv__(self, other):
+        return Fraction(self.num * other.den, self.den * other.num)
+
+x, y = Fraction(3, 4), Fraction(1, 2)
+print(x + y)          # 5/4
+print(x + y + x)      # 2/1  (works because __add__ returns a Fraction!)</code></pre>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-tag">Small Fix</span>
+          <div>In the lecture, <code>__add__</code> returned a formatted string like <code>"10/8"</code>. Returning a new <code>Fraction</code> object instead (and reducing via <code>gcd</code>) lets you chain operations like <code>(x + y) * z</code> cleanly, just like real numbers.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 03 ENCAPSULATION ==================== -->
+    <section class="oop-section" id="encapsulation" data-sec="encapsulation" style="--sec-accent:#34d399;--sec-soft:rgba(52, 211, 153, 0.11);--sec-border:rgba(52, 211, 153, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">03</span>
+        <h2>Encapsulation &amp; Data Protection</h2>
+        <span class="sec-tag">Private (__var) · Name Mangling · Getters/Setters · @property</span>
+      </header>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Why Hide Data? (The Junior Developer Problem)</h3>
+          <span class="sub-pill">Never expose raw variables to arbitrary mutation</span>
+        </div>
+        <p class="lead">
+          If <code>sbi.balance</code> is public, any other developer on your team can accidentally run <code>sbi.balance = "hello"</code> or set it to <code>-99999</code>, instantly crashing <code>withdraw()</code> later. <strong>Encapsulation</strong> means bundling data with the methods that safely control it — keeping attributes private and letting outside code read or modify them <em>only</em> through validated gates (getters/setters or Python's <code>@property</code>).
+        </p>
+
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">How <code>__private</code> Works — Name Mangling</span><span class="card-badge">Nothing Is Truly Private</span></div>
+            <p class="card-p">Prefixing an attribute or method with double underscores (<code>self.__balance</code>) hides it from normal autocomplete and direct access. Behind the scenes, Python silently renames it to <code>_ClassName__balance</code> (e.g., <code>_Atm__balance</code>) — a trick called <strong>Name Mangling</strong>.</p>
+            <ul class="card-list">
+              <li><strong>Tricky Bug to Watch For:</strong> Writing <code>sbi.__balance = 0</code> from outside does <em>not</em> edit the real private balance — it quietly creates a brand-new public variable literally named <code>__balance</code> while <code>_Atm__balance</code> stays untouched!</li>
+              <li><strong>"We are all consenting adults":</strong> Someone <em>can</em> still reach <code>sbi._Atm__balance</code> if they insist. Python discourages accidental misuse rather than putting up iron locks.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Access Conventions in Python</span><span class="card-badge">Public · Protected · Private</span></div>
+            <ul class="card-list">
+              <li><code>balance</code> (no underscore): <strong>Public</strong> — free for anyone to read and modify.</li>
+              <li><code>_balance</code> (single underscore): <strong>Protected</strong> (by convention) — "internal use or subclasses only, please don't touch from outside."</li>
+              <li><code>__balance</code> (double underscore): <strong>Private</strong> — triggers Name Mangling (<code>_Atm__balance</code>) to prevent accidental overrides or outside access.</li>
+            </ul>
+            <div class="card-foot"><strong>Pythonic Upgrade:</strong> Instead of Java-style <code>get_pin()</code> / <code>set_pin()</code>, modern Python uses <code>@property</code> so users write clean <code>sbi.pin = "5678"</code> while validation still runs automatically!</div>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">encapsulation.py — Private Data + Pythonic @property Validation</span><button class="copy-btn">Copy</button></div>
+          <pre class="code-pre"><code class="py-hl">class Atm:
+    def __init__(self, pin, balance=0):
+        self.__pin = pin           # stored internally as _Atm__pin
+        self.__balance = balance   # stored internally as _Atm__balance
+
+    @property
+    def pin(self):                 # Getter: called when reading sbi.pin
+        return self.__pin
+
+    @pin.setter
+    def pin(self, new_pin):        # Setter: runs validation on sbi.pin = ...
+        if isinstance(new_pin, str) and len(new_pin) == 4 and new_pin.isdigit():
+            self.__pin = new_pin
+        else:
+            raise ValueError("PIN must be a 4-digit string")
+
+sbi = Atm("1234", 5000)
+sbi.pin = "5678"     # Runs @pin.setter cleanly!
+# sbi.pin = 99       # Raises ValueError — invalid data is blocked</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 04 OBJECTS, MEMORY & STATIC ==================== -->
+    <section class="oop-section" id="memory" data-sec="memory" style="--sec-accent:#fb923c;--sec-soft:rgba(251, 146, 60, 0.11);--sec-border:rgba(251, 146, 60, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">04</span>
+        <h2>Objects in Memory, Collections &amp; Static Members</h2>
+        <span class="sec-tag">Reference Variables · Mutability · Instance vs Class/Static</span>
+      </header>
+
+      <!-- Reference Variables & Pass by Reference -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Reference Variables, Pass-by-Reference &amp; Mutability</h3>
+          <span class="sub-pill">Custom objects behave like lists (mutable)</span>
+          <span class="fix-pill">Clarification: Set Hashability</span>
+        </div>
+        <p class="lead">
+          When you write <code>sbi = Atm()</code>, the object is created in memory, and <code>sbi</code> is actually a <strong>reference variable</strong> holding that object's memory address (not the object itself). If you just write <code>Atm()</code> without saving it to a variable, the object gets created and immediately lost because nothing points to it.
+        </p>
+
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Passing Objects to Functions</span><span class="card-badge">Aliasing &amp; Mutability</span></div>
+            <p class="card-p">Because custom objects are <strong>mutable</strong> and Python passes object references into functions, modifying an object's attributes inside a function <strong>permanently edits the original object</strong> outside too (same memory <code>id()</code>).</p>
+            <ul class="card-list">
+              <li><strong>Mutable danger (lists / custom objects):</strong> If you don't want a function to alter your original list or object, pass a copy (e.g., <code>L[:]</code> or <code>copy.copy(obj)</code>).</li>
+              <li><strong>Immutable types (<code>int</code>, <code>str</code>, <code>tuple</code>):</strong> Reassigning inside a function creates a new object, leaving the caller's variable untouched.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Storing Objects in Collections</span><span class="card-badge">List · Tuple · Dict · Set</span></div>
+            <p class="card-p">Custom objects are first-class citizens — you can store them in lists, tuples, or dicts and loop over them effortlessly (<code>for c in [c1, c2, c3]: c.intro()</code>).</p>
+            <p class="card-p"><strong>Subtle Correction on Sets:</strong> The lecture suggests custom objects can't go into a <code>set</code> because they're mutable. Actually, Python classes <em>are</em> hashable by default (by memory identity <code>id</code>), so <code>{c1, c2}</code> <strong>works</strong>! They only become unhashable if you define a custom <code>__eq__</code> without also defining <code>__hash__</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instance vs Class/Static Variables & Methods -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Instance vs. Class (Static) Variables &amp; Methods</h3>
+          <span class="sub-pill">Shared across all objects (e.g., auto-incrementing customer ID)</span>
+          <span class="added-pill">+ @classmethod Added</span>
+        </div>
+        <p class="lead">
+          Suppose every new bank customer must automatically get a sequential serial number: Customer 1 gets <code>1</code>, Customer 2 gets <code>2</code>, Customer 3 gets <code>3</code>. An <strong>instance variable</strong> (<code>self.sno</code>) resets for each object, so it can't track the global count. Instead, you create a <strong>Class / Static Variable</strong> outside <code>__init__</code> — shared by the entire class and accessed as <code>ClassName.var</code>.
+        </p>
+
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Method / Variable Type</th><th>Decorator &amp; 1st Param</th><th>What It Accesses</th><th>When to Use</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Instance Method</span></td>
+                <td>None · <code>(self)</code></td>
+                <td>Reads/modifies a specific object's state (<code>self.balance</code>).</td>
+                <td>Default for object behaviors like <code>withdraw()</code> or <code>intro()</code>.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">@classmethod</span></td>
+                <td><code>@classmethod</code> · <code>(cls)</code></td>
+                <td>Reads/modifies <strong>class-level state</strong> (<code>cls.__counter</code>); works cleanly with inheritance!</td>
+                <td><span class="added-pill">+ Best practice</span> Accessing/updating class counters or writing alternative constructors (e.g., <code>User.from_json()</code>).</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">@staticmethod</span></td>
+                <td><code>@staticmethod</code> · none</td>
+                <td>No <code>self</code> or <code>cls</code> — pure utility helper grouped inside the class namespace.</td>
+                <td>Stateless helpers like <code>Atm.is_valid_pin(pin)</code> that can be called without creating an object.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">static_and_class.py — Auto-Increment Serial Number</span><button class="copy-btn">Copy</button></div>
+          <pre class="code-pre"><code class="py-hl">class Customer:
+    __counter = 1   # Class (static) variable — ONE shared copy for all objects
+
+    def __init__(self, name):
+        self.name = name
+        self.sno = Customer.__counter     # Instance variable — unique per object
+        Customer.__counter += 1
+
+    @classmethod
+    def get_next_sno(cls):                # Works cleanly even on subclasses
+        return cls.__counter
+
+    @staticmethod
+    def is_valid_name(name):              # Utility: needs neither self nor cls
+        return isinstance(name, str) and len(name.strip()) &gt; 0
+
+c1, c2 = Customer("Ankita"), Customer("Nitish")
+print(c1.sno, c2.sno)                     # 1 2
+print(Customer.get_next_sno())            # 3 (called without any object!)</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 05 CLASS RELATIONSHIPS & INHERITANCE ==================== -->
+    <section class="oop-section" id="relationships" data-sec="relationships" style="--sec-accent:#f43f5e;--sec-soft:rgba(244, 63, 94, 0.11);--sec-border:rgba(244, 63, 94, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">05</span>
+        <h2>Class Relationships &amp; Inheritance</h2>
+        <span class="sec-tag">Aggregation (Has-A) · Composition · Inheritance (Is-A) · super() · MRO</span>
+      </header>
+
+      <!-- Has-A vs Is-A -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Aggregation (Has-A) vs. Composition vs. Inheritance (Is-A)</h3>
+          <span class="added-pill">+ Composition Added</span>
+        </div>
+        <p class="lead">
+          Real applications aren't just one giant class — they are networks of smaller classes working together. Before connecting two classes, ask one simple English question: <strong>"Does A <em>have</em> a B, or <em>is</em> A a kind of B?"</strong>
+        </p>
+
+        <div class="card-grid cols-3">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Aggregation (Has-A · Loose)</span><span class="card-badge">Customer ◇── Address</span></div>
+            <p class="card-p">One class holds a reference to another object created outside. Example: a <code>Customer</code> <strong>has an</strong> <code>Address</code> object. If the customer is deleted, the address object can still exist independently.</p>
+            <div class="card-foot"><strong>Key pattern:</strong> When <code>customer.edit_profile()</code> updates city/pin, it delegates the change to <code>self.address.change_address(...)</code>.</div>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Composition (Owns-A · Tight)</span><span class="card-badge">House ◆── Room</span></div>
+            <p class="card-p">A stricter form of Has-A where the child object is created <em>inside</em> the owner and cannot meaningfully live without it. Delete the <code>House</code> (or <code>Order</code>), and its <code>Rooms</code> (or <code>OrderItems</code>) disappear too.</p>
+            <div class="card-foot"><strong>Design wisdom:</strong> "Favor composition over inheritance" when you only need to reuse behavior, not build a rigid family tree.</div>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Inheritance (Is-A)</span><span class="card-badge">SmartPhone ──▷ Phone</span></div>
+            <p class="card-p">A child class automatically gains the parent's attributes and methods, eliminating duplicated code (DRY). Example: both <code>Student</code> and <code>Instructor</code> <strong>are</strong> a <code>User</code>, so login/register live once in <code>User</code>.</p>
+            <div class="card-foot"><strong>Rule of thumb:</strong> Inheritance flows strictly downward — a child gets parent features, never the reverse.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What Gets Inherited + super() -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>What Gets Inherited &amp; How <code>super()</code> Works</h3>
+          <span class="fix-pill">Correction: Python super() Placement</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">4 Rules of Inheritance in Python</span><span class="card-badge">Keep These Straight</span></div>
+            <ul class="card-list">
+              <li><strong>Inherited:</strong> Parent's constructor (if child doesn't define its own), all public/protected attributes, and all non-private methods.</li>
+              <li><strong>NOT directly accessible:</strong> Parent's <code>__private</code> members (name-mangled to <code>_Parent__var</code>).</li>
+              <li><strong>Child Constructor Override:</strong> If the child defines its own <code>__init__</code>, the parent's <code>__init__</code> does <strong>not</strong> run automatically — meaning parent attributes won't even exist unless you explicitly call <code>super().__init__(...)</code>!</li>
+              <li><strong>Method Overriding:</strong> If both parent and child define <code>buy()</code>, calling <code>child.buy()</code> executes the child's version.</li>
+            </ul>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title"><code>super()</code> — Calling the Parent Cleanly</span><span class="card-badge">Methods &amp; Constructors Only</span></div>
+            <p class="card-p"><code>super()</code> lets a child class invoke a parent's method or constructor (e.g., <code>super().__init__(price, brand)</code> to avoid repeating setup, or <code>super().buy()</code> to extend instead of completely replacing parent behavior).</p>
+            <ul class="card-list">
+              <li><code>super()</code> only works <strong>inside a class</strong> (never from outside) and is used for <strong>methods/constructors</strong>, not instance attributes.</li>
+              <li><strong>Subtle Fix vs. Lecture:</strong> In <em>Java</em>, <code>super()</code> must be the very first line of a constructor. In <strong>Python</strong>, it's good practice to call it early, but Python allows statements before <code>super().__init__()</code> (like validating inputs first)!</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">inheritance_super.py — Reusing Parent Constructor &amp; Extending Methods</span><button class="copy-btn">Copy</button></div>
+          <pre class="code-pre"><code class="py-hl">class Phone:
+    def __init__(self, price, brand):
+        self.price = price
+        self.brand = brand
+
+    def buy(self):
+        print(f"Buying a {self.brand} phone for ₹{self.price}")
+
+class SmartPhone(Phone):
+    def __init__(self, price, brand, os, ram):
+        super().__init__(price, brand)   # Delegate shared fields to Phone
+        self.os = os
+        self.ram = ram
+
+    def buy(self):
+        super().buy()                    # Run parent logic, then extend it
+        print(f"Specs: {self.os}, {self.ram}GB RAM")
+
+s = SmartPhone(50000, "Apple", "iOS", 8)
+s.buy()</code></pre>
+        </div>
+      </div>
+
+      <!-- Types of Inheritance & MRO -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>5 Types of Inheritance &amp; MRO (Diamond Problem)</h3>
+          <span class="sub-pill">How Python resolves conflicts in Multiple Inheritance</span>
+        </div>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Type</th><th>Structure</th><th>Example &amp; Key Detail</th></tr></thead>
+            <tbody>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Single</span></td><td><code>Parent → Child</code></td><td><code>Phone → SmartPhone</code>. Simplest and most common hierarchy.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Multilevel</span></td><td><code>Grandparent → Parent → Child</code></td><td><code>Product → Phone → SmartPhone</code>. Child inherits down the entire chain.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Hierarchical</span></td><td><code>1 Parent → Many Children</code></td><td><code>User → Student</code> and <code>User → Instructor</code> sharing common login logic.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Multiple</span></td><td><code>(Parent1, Parent2) → Child</code></td><td><code>class SmartPhone(Phone, Product)</code>. Supported in Python (disallowed for classes in Java).</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Hybrid</span></td><td>Combination of the above</td><td>e.g., Diamond shape: <code>A → (B, C) → D</code>. Resolved cleanly using Python's <strong>MRO</strong>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <span class="callout-tag">MRO (Method Resolution Order)</span>
+          <div>If <code>class SmartPhone(Product, Phone)</code> inherits a <code>buy()</code> method from <em>both</em> parents, which one wins? Python follows <strong>MRO (C3 Linearization)</strong> — checking left-to-right in the inheritance tuple: <code>Product.buy()</code> wins here, whereas <code>(Phone, Product)</code> picks <code>Phone.buy()</code>. You can inspect any class's exact lookup order anytime via <code>SmartPhone.mro()</code>.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 06 POLYMORPHISM ==================== -->
+    <section class="oop-section" id="polymorphism" data-sec="polymorphism" style="--sec-accent:#fbbf24;--sec-soft:rgba(251, 191, 36, 0.11);--sec-border:rgba(251, 191, 36, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">06</span>
+        <h2>Polymorphism — One Interface, Many Forms</h2>
+        <span class="sec-tag">Overriding · Overloading · Operator Overloading · Duck Typing</span>
+      </header>
+
+      <p class="lead">
+        <strong>Polymorphism</strong> literally means "many forms" — the same method name or operator behaves appropriately depending on what kind of object you give it. Think of how <code>+</code> adds numbers (<code>2 + 3 == 5</code>), joins strings (<code>"a" + "b" == "ab"</code>), and merges lists (<code>[1] + [2] == [1, 2]</code>).
+      </p>
+
+      <div class="table-card">
+        <table class="ops-table">
+          <thead><tr><th>Form</th><th>How It Works in Python</th><th>Quick Example</th></tr></thead>
+          <tbody>
+            <tr class="op-row">
+              <td class="col-key"><span class="fn-badge">Method Overriding</span></td>
+              <td>A child class redefines a method already present in its parent to provide specialized behavior (runtime polymorphism).</td>
+              <td><code>Phone.buy()</code> prints generic checkout; <code>SmartPhone.buy()</code> prints specs &amp; warranty too.</td>
+            </tr>
+            <tr class="op-row">
+              <td class="col-key"><span class="fn-badge">Method Overloading</span></td>
+              <td><span class="warn-tag">Not native like Java/C++</span> Defining two <code>area()</code> methods in one Python class simply makes the second overwrite the first! Instead, Python achieves the same clean API with <strong>default arguments</strong> or <code>*args</code>.</td>
+              <td><code>def area(self, a, b=0):</code><br><code>area(4)</code> → circle <code>3.14 * 4 * 4</code>;<br><code>area(4, 5)</code> → rectangle <code>4 * 5</code>.</td>
+            </tr>
+            <tr class="op-row">
+              <td class="col-key"><span class="fn-badge">Operator Overloading</span></td>
+              <td>Giving standard operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>==</code>) custom meaning for your own classes by implementing magic methods (<code>__add__</code>, <code>__eq__</code>).</td>
+              <td><code>Fraction(3, 4) + Fraction(1, 2)</code> triggers <code>__add__</code> and returns <code>5/4</code>.</td>
+            </tr>
+            <tr class="op-row">
+              <td class="col-key"><span class="fn-badge">Duck Typing</span></td>
+              <td><span class="added-pill">+ Pythonic Core</span> "If it walks like a duck and quacks like a duck, treat it as a duck." Functions care only whether an object has the needed method — not its parent class!</td>
+              <td>Any object implementing <code>.pay(amount)</code> (UPI, Card, Crypto) works inside <code>checkout(payment)</code> without requiring a shared base class.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== 07 ABSTRACTION & RECAP ==================== -->
+    <section class="oop-section" id="abstraction" data-sec="abstraction" style="--sec-accent:#2dd4bf;--sec-soft:rgba(45, 212, 191, 0.11);--sec-border:rgba(45, 212, 191, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">07</span>
+        <h2>Abstraction &amp; Real-World Practice</h2>
+        <span class="sec-tag">ABC · @abstractmethod · Encapsulation vs Abstraction · Mini Projects</span>
+      </header>
+
+      <!-- Abstraction (Added 4th Pillar) -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Abstraction — Hiding Complexity Behind a Contract</h3>
+          <span class="added-pill">+ Missing 4th Pillar Added</span>
+        </div>
+        <p class="lead">
+          The lecture briefly introduced Abstraction as a pillar at the start, so here is how it actually works in Python. <strong>Abstraction</strong> hides internal implementation details and exposes only the essential operations a user needs — like driving a car using the steering wheel and brake pedal without knowing how fuel injection works. In Python, you enforce an architectural contract using <strong>Abstract Base Classes</strong> (<code>ABC</code> and <code>@abstractmethod</code>): no one can instantiate the abstract parent directly, and every child class <em>must</em> implement the required methods.
+        </p>
+
+        <div class="code-grid">
+          <div class="code-card">
+            <div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">abstraction_abc.py — Enforcing a Contract</span><button class="copy-btn">Copy</button></div>
+            <pre class="code-pre"><code class="py-hl">from abc import ABC, abstractmethod
+
+class BankApp(ABC):
+    def database(self):
+        print("Connected to bank database")
+
+    @abstractmethod
+    def security(self):
+        pass  # Every subclass MUST implement this!
+
+class MobileApp(BankApp):
+    def security(self):
+        print("Biometric + OTP verification")
+
+# app = BankApp()    # TypeError: can't instantiate abstract class
+m = MobileApp()      # Works because security() is implemented
+m.database()
+m.security()</code></pre>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Encapsulation vs. Abstraction</span><span class="card-badge">Most Confused Pair</span></div>
+            <ul class="card-list">
+              <li><strong>Encapsulation (Data Hiding — <em>How</em>):</strong> Wraps data + methods together and protects attributes from invalid outside modification using <code>__private</code> and <code>@property</code>.</li>
+              <li><strong>Abstraction (Implementation Hiding — <em>What</em>):</strong> Focuses on the high-level blueprint/interface — showing <em>what</em> an object can do while hiding <em>how</em> it does it internally, enforced via <code>ABC</code>.</li>
+            </ul>
+            <div class="card-foot"><strong>Quick Memory Hook:</strong> Encapsulation puts a protective capsule around your data; Abstraction gives you a clean dashboard hiding the engine underneath.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini Projects & Cheat Recap -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Putting It Together — Lecture Projects &amp; Quick Rules</h3>
+          <span class="sub-pill">Why real apps feel cleaner in OOP</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Mini Project 1: ATM Simulator</span><span class="card-badge">State + Encapsulation</span></div>
+            <p class="card-p">Models each bank account as an independent <code>Atm</code> object holding private <code>__pin</code> and <code>__balance</code>, with an interactive menu delegating to <code>create_pin()</code>, <code>deposit()</code>, <code>withdraw()</code>, and <code>check_balance()</code>. Creating <code>sbi</code> and <code>hdfc</code> instantly gives isolated accounts with zero duplicated code.</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Mini Project 2: IRCTC Train Schedule CLI</span><span class="card-badge">OOP + Live API</span></div>
+            <p class="card-p">Wraps an HTTP API call (<code>requests.get</code>) inside an <code>IRCTC</code> class: <code>__init__</code> launches the menu, takes a train number, calls a private/helper <code>__fetch_data(train_no)</code> method to fetch JSON station stops, and formats arrival/departure timings cleanly — easy to plug into a web UI or GUI later without touching the fetching logic.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast">Copied to clipboard</div>
+
+  <script>
+    (() => {
+      const PY_KW = new Set([
+        'import', 'from', 'as', 'with', 'in', 'not', 'and', 'or', 'is',
+        'True', 'False', 'None', 'for', 'if', 'elif', 'else', 'return',
+        'def', 'class', 'pass', 'raise', 'self', 'cls'
+      ]);
+      const PY_CLS = new Set([
+        'Atm', 'Fraction', 'Customer', 'Address', 'Phone', 'SmartPhone',
+        'Product', 'User', 'Student', 'Instructor', 'BankApp', 'MobileApp',
+        'ABC', 'ValueError', 'TypeError', 'IRCTC'
+      ]);
+
+      function highlightPython(raw) {
+        const escaped = raw
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        const tokenRegex = /(#[^\n]*)|(@[A-Za-z_][A-Za-z0-9_.]*)|(f?"(?:\\.|[^"\\])*"|f?'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b(?=\s*\()|\b([A-Za-z_][A-Za-z0-9_]*)\b/g;
+
+        return escaped.replace(tokenRegex, (match, comment, dec, str, num, fn, ident) => {
+          if (comment) return `<span class="tok-cm">${comment}</span>`;
+          if (dec) return `<span class="tok-dec">${dec}</span>`;
+          if (str) return `<span class="tok-str">${str}</span>`;
+          if (num) return `<span class="tok-num">${num}</span>`;
+          if (fn) {
+            if (PY_CLS.has(fn)) return `<span class="tok-cls">${fn}</span>`;
+            if (PY_KW.has(fn)) return `<span class="tok-kw">${fn}</span>`;
+            return `<span class="tok-fn">${fn}</span>`;
+          }
+          if (ident) {
+            if (PY_KW.has(ident)) return `<span class="tok-kw">${ident}</span>`;
+            if (PY_CLS.has(ident)) return `<span class="tok-cls">${ident}</span>`;
+          }
+          return match;
+        });
+      }
+
+      document.querySelectorAll('.py-hl').forEach(el => {
+        el.innerHTML = highlightPython(el.textContent);
+      });
+
+      // Pill Filtering
+      const pills = [...document.querySelectorAll('.pill')];
+      const sections = [...document.querySelectorAll('.oop-section')];
+
+      function setFilter(filter) {
+        pills.forEach(p => p.classList.toggle('active', p.dataset.filter === filter));
+        sections.forEach(sec => {
+          sec.classList.toggle('is-hidden', filter !== 'all' && sec.dataset.sec !== filter);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      document.getElementById('filterPills').addEventListener('click', e => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        setFilter(pill.dataset.filter);
+      });
+
+      // Copy Buttons + Toast
+      const toastEl = document.getElementById('toast');
+      let toastTimer;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1400);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const code = btn.closest('.code-card').querySelector('pre').textContent;
+          try {
+            await navigator.clipboard.writeText(code);
+          } catch {
+            const ta = document.createElement('textarea');
+            ta.value = code;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          btn.classList.add('copied');
+          btn.textContent = 'Copied!';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.textContent = 'Copy';
+          }, 1200);
+          showToast('Copied to clipboard');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

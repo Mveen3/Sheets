@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSA</title>
+  <!-- Load Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+
+  <!-- Ultra-Compact Single-Line Sticky Top Header (~40px height) -->
+  <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 py-1 flex items-center justify-between gap-2 flex-nowrap">
+      <!-- Left Group: Compact 24x24 Icon Badge & Title -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <a href="index.html" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-indigo-400 hover:bg-slate-800/60 transition-colors" title="Back to Index Hub">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Hub</span>
+        </a>
+        <span class="h-3.5 w-px bg-slate-300 dark:bg-slate-700/80 mx-0.5" aria-hidden="true"></span>
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-600 text-white shadow-sm shrink-0">
+          <!-- Graph / Network SVG Icon -->
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="2.4" />
+            <circle cx="18" cy="7" r="2.4" />
+            <circle cx="7" cy="18" r="2.4" />
+            <circle cx="18" cy="17" r="2.4" />
+            <path stroke-linecap="round" d="M8.3 6.8l7.2.4M6.5 8.5l.4 7M9.2 17.5l6.5-.4M16.2 9l-7.4 7.2" />
+          </svg>
+        </span>
+        <h1 class="text-sm font-extrabold tracking-tight leading-none text-slate-900 dark:text-white">
+          DSA
+        </h1>
+      </div>
+
+      <!-- Center Group: Four 32x32 Circular SVG Progress Rings (Overall | Easy, Medium, Hard) -->
+      <div id="headerProgressRings" class="flex items-center gap-1.5 sm:gap-2 shrink-0" aria-label="Progress indicators">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- Right Group: Compact Theme Toggle & Reset Button -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button
+          id="themeToggleBtn"
+          type="button"
+          aria-label="Toggle dark mode"
+          title="Toggle Light / Dark Theme"
+          class="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+        >
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg class="w-3.5 h-3.5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg class="w-3.5 h-3.5 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </button>
+
+        <button
+          id="openResetModalBtn"
+          type="button"
+          class="h-7 px-2.5 rounded-lg text-[11px] font-semibold border border-rose-200 dark:border-rose-900/70 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container (Non-sticky, scrolls normally) -->
+  <main class="max-w-5xl mx-auto px-3 sm:px-5 py-5 pb-12 space-y-4">
+
+    <!-- Unified Single-Row Filter & Action Toolbar -->
+    <section aria-label="Filter and layout controls" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-3.5 py-2.5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <!-- Left Group: Status & Difficulty Segmented Controls -->
+        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+          <!-- Status Segmented Control -->
+          <div class="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/70 dark:border-slate-700/70" role="group" aria-label="Filter by completion status">
+            <button type="button" data-status-filter="all" class="status-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              All
+            </button>
+            <button type="button" data-status-filter="pending" class="status-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              Remaining
+            </button>
+            <button type="button" data-status-filter="completed" class="status-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              Completed
+            </button>
+          </div>
+
+          <!-- Subtle Vertical Divider -->
+          <span class="hidden md:inline-block h-6 w-px bg-slate-200 dark:bg-slate-800" aria-hidden="true"></span>
+
+          <!-- Difficulty Segmented Control -->
+          <div class="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/70 dark:border-slate-700/70" role="group" aria-label="Filter by difficulty">
+            <button type="button" data-diff-filter="all" class="diff-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              Any
+            </button>
+            <button type="button" data-diff-filter="Easy" class="diff-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Easy
+            </button>
+            <button type="button" data-diff-filter="Medium" class="diff-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Medium
+            </button>
+            <button type="button" data-diff-filter="Hard" class="diff-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+              Hard
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Group: Topic Order + Expand / Collapse Actions -->
+        <div class="flex flex-wrap items-center gap-1.5 ml-auto">
+          <button
+            id="openOrderModalBtn"
+            type="button"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+            </svg>
+            Topic Order
+          </button>
+
+          <span class="hidden sm:inline-block h-4 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" aria-hidden="true"></span>
+
+          <div class="inline-flex items-center gap-1">
+            <button
+              id="expandAllBtn"
+              type="button"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 9l5-5 5 5M7 15l5 5 5-5" />
+              </svg>
+              Expand All
+            </button>
+            <span class="h-3.5 w-px bg-slate-200 dark:bg-slate-700" aria-hidden="true"></span>
+            <button
+              id="collapseAllBtn"
+              type="button"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 5l5 5 5-5M7 19l5-5 5 5" />
+              </svg>
+              Collapse All
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Topic Cards Container -->
+    <div id="sectionsContainer" class="space-y-4">
+      <!-- Sections dynamically rendered via JavaScript -->
+    </div>
+
+    <!-- Empty Filter State -->
+    <div id="emptyState" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+      </div>
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white">No matching problems found</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Try adjusting your status or difficulty filters to view more problems.</p>
+      <button id="resetFiltersBtn" type="button" class="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition">
+        Reset Filters
+      </button>
+    </div>
+  </main>
+
+  <!-- Topic Sequence Reorder Modal -->
+  <div id="orderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3 shrink-0">
+        <div>
+          <h2 id="orderModalTitle" class="text-base font-bold text-slate-900 dark:text-white">
+            Topic Sequence
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Drag topics or use the arrow buttons to set your study priority order.
+          </p>
+        </div>
+        <button
+          id="closeOrderModalXBtn"
+          type="button"
+          aria-label="Close topic sequence modal"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scrollable Reorderable Topic List -->
+      <div id="orderListContainer" class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-2">
+        <!-- Topic rows dynamically populated via JS -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 py-3.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+        <button
+          id="resetOrderDefaultBtn"
+          type="button"
+          class="px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+        >
+          Reset Default Order
+        </button>
+        <button
+          id="doneOrderModalBtn"
+          type="button"
+          class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition-colors"
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Progress Confirmation Modal -->
+  <div id="resetModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 id="resetModalTitle" class="text-base font-bold text-slate-900 dark:text-white">Reset All Progress?</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">This will uncheck all 98 problems.</p>
+        </div>
+      </div>
+      <div class="mt-6 flex items-center justify-end gap-2.5">
+        <button id="cancelResetBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          Cancel
+        </button>
+        <button id="confirmResetBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 shadow-sm transition">
+          Yes, Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brief Toast Notification -->
+  <div id="toast" class="pointer-events-none fixed bottom-5 right-5 z-50 opacity-0 translate-y-2 transition-all duration-200" role="status" aria-live="polite">
+    <div class="px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-semibold shadow-lg flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 dark:bg-emerald-600"></span>
+      <span id="toastMessage">Marked complete</span>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Complete Curated Dataset: 98 Unique LeetCode Problems across 24 DS/ML-Prioritized Topics
+     * Breakdown: 14 Easy, 62 Medium, 22 Hard (Total = 98, Zero Duplicates)
+     */
+    const DEFAULT_TOPICS = [
+      {
+        id: 'arrays-strings',
+        title: 'Arrays and Strings',
+        priority: 'Core',
+        description: 'Matrix transforms, in-place indexing, prefix/suffix sweeps, and numerical arrays',
+        items: [
+          {
+            id: 'lc-53',
+            pattern: "Kadane's Algorithm",
+            insight: 'Reset running sum whenever it drops below the current element.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 53, title: 'Maximum Subarray', slug: 'maximum-subarray', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-238',
+            pattern: 'Prefix & Suffix Products',
+            insight: 'Two passes (left prefix product, right suffix product) without using division.',
+            complexity: 'O(n) time / O(1) extra space',
+            problem: { num: 238, title: 'Product of Array Except Self', slug: 'product-of-array-except-self', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-48',
+            pattern: 'In-Place Matrix Transform',
+            insight: 'Rotate a square matrix 90° clockwise in-place by transposing then reversing each row.',
+            complexity: 'O(n²) time / O(1) space',
+            problem: { num: 48, title: 'Rotate Image', slug: 'rotate-image', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-31',
+            pattern: 'Lexicographical Pivot Swap',
+            insight: 'Find rightmost decreasing pivot, swap with smallest larger successor on the right, and reverse suffix.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 31, title: 'Next Permutation', slug: 'next-permutation', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-41',
+            pattern: 'Cyclic Sort / Index Placement',
+            insight: 'Place each valid value v in [1, n] at index v - 1 in-place.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 41, title: 'First Missing Positive', slug: 'first-missing-positive', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'heaps',
+        title: 'Heaps and Priority Queues',
+        priority: 'Core',
+        description: 'Top-K retrieval, beam search candidates, and streaming median/quantile estimation',
+        items: [
+          {
+            id: 'lc-215',
+            pattern: 'Min-Heap / Quickselect',
+            insight: 'Maintain a min-heap of size k (or use Quickselect for O(n) average time).',
+            complexity: 'O(n log k) time / O(k) space',
+            problem: { num: 215, title: 'Kth Largest Element in an Array', slug: 'kth-largest-element-in-an-array', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-347',
+            pattern: 'Frequency Map + Heap / Bucket Sort',
+            insight: 'Count frequencies with a hash map, then extract top k via size-k min-heap or bucket sort.',
+            complexity: 'O(n log k) or O(n) time / O(n) space',
+            problem: { num: 347, title: 'Top K Frequent Elements', slug: 'top-k-frequent-elements', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-295',
+            pattern: 'Dual-Heap Balancing',
+            insight: 'Max-heap for lower half and min-heap for upper half differing by at most 1 element.',
+            complexity: 'O(log n) add / O(1) median',
+            problem: { num: 295, title: 'Find Median from Data Stream', slug: 'find-median-from-data-stream', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'sliding-window',
+        title: 'Sliding Window',
+        priority: 'Core',
+        description: 'Time-series rolling windows, streaming aggregations, and contiguous token slicing',
+        items: [
+          {
+            id: 'lc-3',
+            pattern: 'Dynamic Hash-Backed Window',
+            insight: 'Track last-seen character indices to jump the left pointer past duplicates.',
+            complexity: 'O(n) time / O(min(n, Σ)) space',
+            problem: { num: 3, title: 'Longest Substring Without Repeating Characters', slug: 'longest-substring-without-repeating-characters', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-424',
+            pattern: 'Dominant Frequency Window',
+            insight: 'Track maxFreq in the current window; shrink when (r - l + 1) - maxFreq > k.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 424, title: 'Longest Repeating Character Replacement', slug: 'longest-repeating-character-replacement', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-76',
+            pattern: 'Contract-on-Valid Window',
+            insight: 'Expand right until all required character counts are satisfied, then contract left to minimize length.',
+            complexity: 'O(m + n) time / O(Σ) space',
+            problem: { num: 76, title: 'Minimum Window Substring', slug: 'minimum-window-substring', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'two-pointers',
+        title: 'Two Pointers',
+        priority: 'Core',
+        description: 'Sorted feature scanning, pair/triplet optimization, and O(1)-space linear sweeps',
+        items: [
+          {
+            id: 'lc-15',
+            pattern: 'Sort + Opposite-End Pointers',
+            insight: 'Sort the array, fix one value, and use opposite-end pointers while skipping duplicates.',
+            complexity: 'O(n²) time / O(1) extra space',
+            problem: { num: 15, title: '3Sum', slug: '3sum', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-11',
+            pattern: 'Greedy Converging Pointers',
+            insight: 'Start at both ends and greedily advance the pointer with the shorter vertical line.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 11, title: 'Container With Most Water', slug: 'container-with-most-water', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-42',
+            pattern: 'Running Boundary Max Pointers',
+            insight: 'Maintain running leftMax and rightMax inward, accumulating water on the strictly smaller side.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 42, title: 'Trapping Rain Water', slug: 'trapping-rain-water', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'hash-maps',
+        title: 'Hash Maps and Sets',
+        priority: 'Core',
+        description: 'Feature lookups, frequency counting, deduplication, and O(1) random sampling',
+        items: [
+          {
+            id: 'lc-1',
+            pattern: 'Complement Hash Lookup',
+            insight: 'Store seen values to indices in a hash map and check for target - num in a single pass.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 1, title: 'Two Sum', slug: 'two-sum', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-49',
+            pattern: 'Canonical Key Bucketing',
+            insight: 'Map each string to a canonical key (26-element character count tuple) to bucket anagrams.',
+            complexity: 'O(n·k) time / O(n·k) space',
+            problem: { num: 49, title: 'Group Anagrams', slug: 'group-anagrams', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-128',
+            pattern: 'Sequence Start Detection',
+            insight: 'Insert all elements into a hash set and expand streaks only when num - 1 is absent.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 128, title: 'Longest Consecutive Sequence', slug: 'longest-consecutive-sequence', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-36',
+            pattern: 'Multi-Axis Constraint Sets',
+            insight: 'Track seen digits across rows, columns, and 3×3 sub-boxes using hash sets or bitmasks.',
+            complexity: 'O(1) time / O(1) space',
+            problem: { num: 36, title: 'Valid Sudoku', slug: 'valid-sudoku', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-380',
+            pattern: 'Array + Index Map Swap-Delete',
+            insight: 'Pair a dynamic array with a value-to-index map; swap the target with the last element on delete.',
+            complexity: 'O(1) avg time / O(n) space',
+            problem: { num: 380, title: 'Insert Delete GetRandom O(1)', slug: 'insert-delete-getrandom-o1', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'prefix-sums',
+        title: 'Prefix Sums',
+        priority: 'Core',
+        description: 'Cumulative distributions, fast range aggregations, and 2D integral matrices',
+        items: [
+          {
+            id: 'lc-560',
+            pattern: 'Prefix Sum Frequency Map',
+            insight: 'Track prefix sum frequencies in a hash map and add count[currSum - k] at each step.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 560, title: 'Subarray Sum Equals K', slug: 'subarray-sum-equals-k', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-525',
+            pattern: 'Balanced Zero-Sum Prefix',
+            insight: 'Treat 0 as -1 and record the earliest index of each prefix sum to find the longest zero-sum subarray.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 525, title: 'Contiguous Array', slug: 'contiguous-array', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-304',
+            pattern: '2D Integral Matrix',
+            insight: 'Precompute a 2D prefix table and answer rectangular submatrix sums in O(1) via inclusion-exclusion.',
+            complexity: 'O(m·n) build / O(1) query',
+            problem: { num: 304, title: 'Range Sum Query 2D - Immutable', slug: 'range-sum-query-2d-immutable', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'binary-search',
+        title: 'Binary Search',
+        priority: 'Core',
+        description: 'Threshold tuning, monotonic answer-space optimization, and quantile partitioning',
+        items: [
+          {
+            id: 'lc-704',
+            pattern: 'Standard Loop Invariant',
+            insight: 'Foundational loop invariant, overflow-safe midpoint l + floor((r - l)/2), and boundary updates.',
+            complexity: 'O(log n) time / O(1) space',
+            problem: { num: 704, title: 'Binary Search', slug: 'binary-search', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-34',
+            pattern: 'Lower & Upper Bound Search',
+            insight: 'Run two boundary searches (lower bound and upper bound) rather than linear expansion.',
+            complexity: 'O(log n) time / O(1) space',
+            problem: { num: 34, title: 'Find First and Last Position of Element in Sorted Array', slug: 'find-first-and-last-position-of-element-in-sorted-array', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-33',
+            pattern: 'Sorted-Half Discrimination',
+            insight: 'At every midpoint, at least one half is strictly sorted; check whether the target lies inside it.',
+            complexity: 'O(log n) time / O(1) space',
+            problem: { num: 33, title: 'Search in Rotated Sorted Array', slug: 'search-in-rotated-sorted-array', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-875',
+            pattern: 'Binary Search on Answer Space',
+            insight: 'Binary search on the answer space using a monotonic feasibility function over eating speed k.',
+            complexity: 'O(n log M) time / O(1) space',
+            problem: { num: 875, title: 'Koko Eating Bananas', slug: 'koko-eating-bananas', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-4',
+            pattern: 'Partition Cut Binary Search',
+            insight: 'Binary search the partition cut on the smaller array so left-half max ≤ right-half min.',
+            complexity: 'O(log(min(m, n))) time / O(1) space',
+            problem: { num: 4, title: 'Median of Two Sorted Arrays', slug: 'median-of-two-sorted-arrays', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'dp-core',
+        title: 'Dynamic Programming: 1D & Core Recurrences',
+        priority: 'High',
+        description: 'Base cases, space-compressed 1D states, bitwise transitions, and prefix segmentation',
+        items: [
+          {
+            id: 'lc-70',
+            pattern: 'Linear / Fibonacci',
+            insight: 'Recurrence dp[i] = dp[i-1] + dp[i-2]; compress state to two variables.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 70, title: 'Climbing Stairs', slug: 'climbing-stairs', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-746',
+            pattern: 'Linear (Min-Cost)',
+            insight: 'Treat the top floor as index n with free starts at 0 and 1; pay cost upon leaving a step.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 746, title: 'Min Cost Climbing Stairs', slug: 'min-cost-climbing-stairs', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-121',
+            pattern: 'State Tracking',
+            insight: 'Track running minimum buy price and max profit so far; gateway to the Stock DP family.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 121, title: 'Best Time to Buy and Sell Stock', slug: 'best-time-to-buy-and-sell-stock', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-338',
+            pattern: 'Bitwise Linear DP',
+            insight: 'Reuse previous bit counts via dp[i] = dp[i >> 1] + (i & 1).',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 338, title: 'Counting Bits', slug: 'counting-bits', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-198',
+            pattern: 'Linear (Include/Exclude)',
+            insight: 'Choose between skipping the current index or taking it plus dp[i-2].',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 198, title: 'House Robber', slug: 'house-robber', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-91',
+            pattern: 'Linear String DP',
+            insight: 'Conditional transitions based on valid 1-digit (1–9) and 2-digit (10–26) prefixes.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 91, title: 'Decode Ways', slug: 'decode-ways', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-139',
+            pattern: 'String Prefix DP',
+            insight: 'dp[i] is true if any prefix dp[j] is true and substring s[j..i] exists in the dictionary.',
+            complexity: 'O(n²·m) time / O(n) space',
+            problem: { num: 139, title: 'Word Break', slug: 'word-break', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'dp-knapsack-subseq',
+        title: 'Dynamic Programming: Knapsack, Subsequences & Grids',
+        priority: 'High',
+        description: '0/1 and unbounded knapsack, sequence alignment (LCS/Edit Distance), 2D grids, and tree DP',
+        items: [
+          {
+            id: 'lc-322',
+            pattern: 'Unbounded Knapsack',
+            insight: 'Items can be reused; iterate amount forward to minimize coins for each sub-amount.',
+            complexity: 'O(n·A) time / O(A) space',
+            problem: { num: 322, title: 'Coin Change', slug: 'coin-change', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-416',
+            pattern: '0/1 Knapsack (Boolean)',
+            insight: 'Each element is used at most once; iterate target sum backward in 1D DP to avoid reuse.',
+            complexity: 'O(n·S) time / O(S) space',
+            problem: { num: 416, title: 'Partition Equal Subset Sum', slug: 'partition-equal-subset-sum', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-494',
+            pattern: '0/1 Knapsack (Counting)',
+            insight: 'Algebraically reduce +/- assignment to counting subsets with sum (total + target) / 2.',
+            complexity: 'O(n·S) time / O(S) space',
+            problem: { num: 494, title: 'Target Sum', slug: 'target-sum', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-64',
+            pattern: '2D Grid DP',
+            insight: 'Transition from top or left neighbor; optimize 2D table down to a single 1D row.',
+            complexity: 'O(m·n) time / O(n) space',
+            problem: { num: 64, title: 'Minimum Path Sum', slug: 'minimum-path-sum', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-300',
+            pattern: 'LIS + Patience Sorting',
+            insight: 'Master the O(n²) DP state first, then optimize to O(n log n) using binary search.',
+            complexity: 'O(n log n) time / O(n) space',
+            problem: { num: 300, title: 'Longest Increasing Subsequence', slug: 'longest-increasing-subsequence', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1143',
+            pattern: 'Two-String DP (LCS)',
+            insight: 'Match characters diagonally (dp[i-1][j-1] + 1) or take max of skipping either character.',
+            complexity: 'O(m·n) time / O(min(m, n)) space',
+            problem: { num: 1143, title: 'Longest Common Subsequence', slug: 'longest-common-subsequence', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-72',
+            pattern: 'Two-String DP',
+            insight: 'Generalizes LCS into three transitions: insert, delete, and replace.',
+            complexity: 'O(m·n) time / O(min(m, n)) space',
+            problem: { num: 72, title: 'Edit Distance', slug: 'edit-distance', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-337',
+            pattern: 'Tree DP',
+            insight: 'Post-order DFS returning a pair (rob_node, skip_node) so parent decisions depend only on direct children.',
+            complexity: 'O(n) time / O(h) space',
+            problem: { num: 337, title: 'House Robber III', slug: 'house-robber-iii', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'dp-advanced',
+        title: 'Dynamic Programming: Advanced State & Intervals',
+        priority: 'High',
+        description: 'Multi-transaction state machines, interval partitioning, DAG memoization, and wildcard matching',
+        items: [
+          {
+            id: 'lc-188',
+            pattern: 'State Machine DP',
+            insight: 'Maintain buy[j] and sell[j] states for up to k transactions; switch to greedy if k ≥ n / 2.',
+            complexity: 'O(n·k) time / O(k) space',
+            problem: { num: 188, title: 'Best Time to Buy and Sell Stock IV', slug: 'best-time-to-buy-and-sell-stock-iv', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-115',
+            pattern: 'Two-String Counting DP',
+            insight: 'When characters match, sum both choices: match current character or skip it in the source string.',
+            complexity: 'O(m·n) time / O(n) space',
+            problem: { num: 115, title: 'Distinct Subsequences', slug: 'distinct-subsequences', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-312',
+            pattern: 'Interval / MCM DP',
+            insight: 'Reverse thinking: pick the last balloon k to burst in range (l, r) so subproblems stay independent.',
+            complexity: 'O(n³) time / O(n²) space',
+            problem: { num: 312, title: 'Burst Balloons', slug: 'burst-balloons', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-329',
+            pattern: 'Grid / DAG Memoization',
+            insight: 'Strictly increasing transitions form a DAG (no cycles); top-down DFS + memoization beats bottom-up.',
+            complexity: 'O(m·n) time / O(m·n) space',
+            problem: { num: 329, title: 'Longest Increasing Path in a Matrix', slug: 'longest-increasing-path-in-a-matrix', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-10',
+            pattern: 'Advanced String Matching',
+            insight: "Split the '*' wildcard transition into zero occurrences (j - 2) vs. one-or-more occurrences (i - 1).",
+            complexity: 'O(m·n) time / O(m·n) space',
+            problem: { num: 10, title: 'Regular Expression Matching', slug: 'regular-expression-matching', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'graphs-fundamentals',
+        title: 'Graphs: Fundamentals & Traversals',
+        priority: 'High',
+        description: 'Adjacency lists, vertex degrees, grid DFS, multi-source BFS, and unweighted grid shortest paths',
+        items: [
+          {
+            id: 'lc-1971',
+            pattern: 'Graph Representation & Basic Reachability',
+            insight: 'Building adjacency lists and checking connectivity via BFS/DFS.',
+            complexity: 'O(V + E) time / O(V + E) space',
+            problem: { num: 1971, title: 'Find if Path Exists in Graph', slug: 'find-if-path-exists-in-graph', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-997',
+            pattern: 'Indegree & Outdegree Counting',
+            insight: 'Solving directed graph properties in O(V + E) using degree arrays.',
+            complexity: 'O(V + E) time / O(V) space',
+            problem: { num: 997, title: 'Find the Town Judge', slug: 'find-the-town-judge', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-200',
+            pattern: 'Grid DFS & Connected Components',
+            insight: 'Counting distinct islands and flood-filling 2D regions.',
+            complexity: 'O(m·n) time / O(m·n) space',
+            problem: { num: 200, title: 'Number of Islands', slug: 'number-of-islands', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-994',
+            pattern: 'Multi-Source BFS',
+            insight: 'Simultaneous wave propagation from multiple starting cells.',
+            complexity: 'O(m·n) time / O(m·n) space',
+            problem: { num: 994, title: 'Rotting Oranges', slug: 'rotting-oranges', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1091',
+            pattern: 'Shortest Path in Unweighted Grid (BFS)',
+            insight: 'Level-order 8-directional grid traversal for minimum steps.',
+            complexity: 'O(n²) time / O(n²) space',
+            problem: { num: 1091, title: 'Shortest Path in Binary Matrix', slug: 'shortest-path-in-binary-matrix', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'graphs-toposort',
+        title: 'Graphs: Directed Cycles & Topological Sort',
+        priority: 'High',
+        description: 'DAG dependency resolution, cycle detection, and critical path scheduling',
+        items: [
+          {
+            id: 'lc-210',
+            pattern: "Topological Sort (Kahn's BFS & DFS)",
+            insight: 'Linear dependency ordering and cycle verification in directed graphs.',
+            complexity: 'O(V + E) time / O(V + E) space',
+            problem: { num: 210, title: 'Course Schedule II', slug: 'course-schedule-ii', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-802',
+            pattern: 'Directed Cycle Detection (3-Color DFS)',
+            insight: 'Identifying nodes that never lead into directed cycles.',
+            complexity: 'O(V + E) time / O(V) space',
+            problem: { num: 802, title: 'Find Eventual Safe States', slug: 'find-eventual-safe-states', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-2050',
+            pattern: 'DAG Critical Path (Topological DP)',
+            insight: 'Propagating longest completion times across prerequisite DAGs.',
+            complexity: 'O(V + E) time / O(V + E) space',
+            problem: { num: 2050, title: 'Parallel Courses III', slug: 'parallel-courses-iii', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'graphs-shortest-paths',
+        title: 'Graphs: Shortest Path Engines',
+        priority: 'High',
+        description: 'Implicit state BFS, Dijkstra, Bellman-Ford, Floyd-Warshall, and 0-1 Deque BFS',
+        items: [
+          {
+            id: 'lc-127',
+            pattern: 'Implicit Graph BFS (State Transformation)',
+            insight: 'Shortest transformation sequence where edges are generated dynamically.',
+            complexity: 'O(N·L²) time / O(N·L) space',
+            problem: { num: 127, title: 'Word Ladder', slug: 'word-ladder', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-743',
+            pattern: "Dijkstra's Algorithm (Min-Heap)",
+            insight: 'Single-source shortest paths on graphs with non-negative weights.',
+            complexity: 'O((V + E) log V) time / O(V + E) space',
+            problem: { num: 743, title: 'Network Delay Time', slug: 'network-delay-time', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-787',
+            pattern: 'Bellman-Ford / K-Stop Constrained Shortest Path',
+            insight: 'Edge-relaxation rounds supporting edge-count limits or negative weights.',
+            complexity: 'O(K·E) time / O(V) space',
+            problem: { num: 787, title: 'Cheapest Flights Within K Stops', slug: 'cheapest-flights-within-k-stops', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1334',
+            pattern: 'Floyd-Warshall (All-Pairs Shortest Path)',
+            insight: 'O(V³) intermediate-node relaxation for dense small graphs.',
+            complexity: 'O(V³) time / O(V²) space',
+            problem: { num: 1334, title: 'Find the City With the Smallest Number of Neighbors at a Threshold Distance', slug: 'find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1368',
+            pattern: '0-1 BFS (Deque Shortest Path)',
+            insight: 'Linear-time shortest path when edge weights are strictly 0 or 1.',
+            complexity: 'O(m·n) time / O(m·n) space',
+            problem: { num: 1368, title: 'Minimum Cost to Make at Least One Valid Path in a Grid', slug: 'minimum-cost-to-make-at-least-one-valid-path-in-a-grid', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'union-find-mst',
+        title: 'Union-Find (DSU) & Minimum Spanning Tree',
+        priority: 'Medium',
+        description: 'Entity resolution, clustering connected components, cycle detection, and MST construction',
+        items: [
+          {
+            id: 'lc-547',
+            pattern: 'Component Counting via DSU',
+            insight: 'Initialize n disjoint sets, union connected cities, and decrement component count on each merge.',
+            complexity: 'O(n²·α(n)) time / O(n) space',
+            problem: { num: 547, title: 'Number of Provinces', slug: 'number-of-provinces', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-684',
+            pattern: 'Undirected Cycle Detection (DSU)',
+            insight: 'Process edges sequentially; the first edge whose endpoints already share a root completes a cycle.',
+            complexity: 'O(n·α(n)) time / O(n) space',
+            problem: { num: 684, title: 'Redundant Connection', slug: 'redundant-connection', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-721',
+            pattern: 'Equivalence Class Grouping',
+            insight: 'Union email indices belonging to the same account, then group emails by canonical root.',
+            complexity: 'O(NK log(NK)) time / O(NK) space',
+            problem: { num: 721, title: 'Accounts Merge', slug: 'accounts-merge', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1319',
+            pattern: 'Disjoint Components & Extra Edges (DSU)',
+            insight: 'Counting connected components and minimum rewiring operations.',
+            complexity: 'O(E·α(V)) time / O(V) space',
+            problem: { num: 1319, title: 'Number of Operations to Make Network Connected', slug: 'number-of-operations-to-make-network-connected', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1584',
+            pattern: "Minimum Spanning Tree (Prim's & Kruskal's)",
+            insight: 'Connecting all vertices with minimum total edge weight.',
+            complexity: 'O(n² log n) time / O(n²) space',
+            problem: { num: 1584, title: 'Min Cost to Connect All Points', slug: 'min-cost-to-connect-all-points', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'graphs-advanced',
+        title: 'Graphs: Bipartite, Bridges & Advanced Templates',
+        priority: 'Medium',
+        description: 'Two-coloring, Tarjan low-link bridges, Eulerian paths, and bitmask state-space BFS',
+        items: [
+          {
+            id: 'lc-785',
+            pattern: 'Bipartite Graph & Two-Coloring (BFS / DFS)',
+            insight: 'Partitioning vertices into two conflict-free sets (odd-cycle detection).',
+            complexity: 'O(V + E) time / O(V) space',
+            problem: { num: 785, title: 'Is Graph Bipartite?', slug: 'is-graph-bipartite', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-1192',
+            pattern: "Tarjan's Algorithm (Bridges & Low-Link Values)",
+            insight: 'Finding critical edges whose removal disconnects the network.',
+            complexity: 'O(V + E) time / O(V + E) space',
+            problem: { num: 1192, title: 'Critical Connections in a Network', slug: 'critical-connections-in-a-network', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-332',
+            pattern: "Eulerian Path (Hierholzer's Algorithm)",
+            insight: 'Constructing a lexicographically smallest trail visiting every edge once.',
+            complexity: 'O(E log E) time / O(V + E) space',
+            problem: { num: 332, title: 'Reconstruct Itinerary', slug: 'reconstruct-itinerary', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-847',
+            pattern: 'Bitmask BFS / Traveling Salesman State Space',
+            insight: 'Shortest walk visiting every node using (node, visitedMask) states.',
+            complexity: 'O(n²·2^n) time / O(n·2^n) space',
+            problem: { num: 847, title: 'Shortest Path Visiting All Nodes', slug: 'shortest-path-visiting-all-nodes', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'binary-trees',
+        title: 'Binary Trees & BST',
+        priority: 'Medium',
+        description: 'Decision tree invariants, recursive structure reconstruction, and hierarchy queries',
+        items: [
+          {
+            id: 'lc-98',
+            pattern: 'Top-Down Bound Propagation',
+            insight: 'Pass strict (minVal, maxVal) bounds downward instead of checking only direct parent-child links.',
+            complexity: 'O(n) time / O(h) space',
+            problem: { num: 98, title: 'Validate Binary Search Tree', slug: 'validate-binary-search-tree', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-105',
+            pattern: 'Index-Map Subtree Splitting',
+            insight: 'Pick roots sequentially from preorder and use a hash map on inorder indices to split left/right subtrees in O(1).',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 105, title: 'Construct Binary Tree from Preorder and Inorder Traversal', slug: 'construct-binary-tree-from-preorder-and-inorder-traversal', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-236',
+            pattern: 'Post-Order Ancestor Bubble-Up',
+            insight: 'Return current node if both left and right subtrees report a target match.',
+            complexity: 'O(n) time / O(h) space',
+            problem: { num: 236, title: 'Lowest Common Ancestor of a Binary Tree', slug: 'lowest-common-ancestor-of-a-binary-tree', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'tree-traversals',
+        title: 'BFS and DFS on Trees',
+        priority: 'Medium',
+        description: 'Level-wise traversal, tree depth/diameter metrics, and optimal path aggregation',
+        items: [
+          {
+            id: 'lc-102',
+            pattern: 'Queue-Based Level Snapshot BFS',
+            insight: 'Standard queue-based BFS snapping queue length at the start of each level.',
+            complexity: 'O(n) time / O(w) space',
+            problem: { num: 102, title: 'Binary Tree Level Order Traversal', slug: 'binary-tree-level-order-traversal', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-543',
+            pattern: 'Post-Order Height & Global Max',
+            insight: 'Return subtree height while updating the global max of leftHeight + rightHeight.',
+            complexity: 'O(n) time / O(h) space',
+            problem: { num: 543, title: 'Diameter of Binary Tree', slug: 'diameter-of-binary-tree', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-124',
+            pattern: 'Post-Order Split vs. Branch Gain',
+            insight: 'Clamp negative branch gains to 0; update global best with split path, return single best branch.',
+            complexity: 'O(n) time / O(h) space',
+            problem: { num: 124, title: 'Binary Tree Maximum Path Sum', slug: 'binary-tree-maximum-path-sum', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'stacks-queues',
+        title: 'Stacks and Queues',
+        priority: 'Medium',
+        description: 'Monotonic window extrema, expression parsing, and LIFO state tracking',
+        items: [
+          {
+            id: 'lc-20',
+            pattern: 'LIFO Bracket Matching',
+            insight: 'Push opening brackets onto a stack and verify exact LIFO matching on every closing bracket.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 20, title: 'Valid Parentheses', slug: 'valid-parentheses', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-155',
+            pattern: 'Auxiliary Min-Tracking Stack',
+            insight: 'Store (value, currentMin) pairs or maintain a synchronized auxiliary stack for O(1) minimums.',
+            complexity: 'O(1) per op / O(n) space',
+            problem: { num: 155, title: 'Min Stack', slug: 'min-stack', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-739',
+            pattern: 'Monotonic Decreasing Stack',
+            insight: 'Monotonic decreasing stack of indices to resolve the next warmer day in a single pass.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 739, title: 'Daily Temperatures', slug: 'daily-temperatures', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-239',
+            pattern: 'Monotonic Decreasing Deque',
+            insight: 'Drop indices outside the window from the front and smaller values from the back.',
+            complexity: 'O(n) time / O(k) space',
+            problem: { num: 239, title: 'Sliding Window Maximum', slug: 'sliding-window-maximum', difficulty: 'Hard' }
+          },
+          {
+            id: 'lc-84',
+            pattern: 'Monotonic Increasing Stack',
+            insight: 'Compute the nearest strictly smaller bar on both sides of every bar.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 84, title: 'Largest Rectangle in Histogram', slug: 'largest-rectangle-in-histogram', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'intervals',
+        title: 'Intervals',
+        priority: 'Medium',
+        description: 'Event merging, time-series span consolidation, and greedy resource scheduling',
+        items: [
+          {
+            id: 'lc-56',
+            pattern: 'Sort & Merge Overlapping Spans',
+            insight: "Sort by start time and extend the current merged interval's end whenever intervals overlap.",
+            complexity: 'O(n log n) time / O(n) space',
+            problem: { num: 56, title: 'Merge Intervals', slug: 'merge-intervals', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-57',
+            pattern: 'Linear Three-Phase Scan',
+            insight: 'Copy strictly before, merge all overlapping intervals, then copy strictly after.',
+            complexity: 'O(n) time / O(n) space',
+            problem: { num: 57, title: 'Insert Interval', slug: 'insert-interval', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-435',
+            pattern: 'Greedy Interval Scheduling',
+            insight: 'Sort by end time and greedily keep intervals that finish earliest.',
+            complexity: 'O(n log n) time / O(1) extra space',
+            problem: { num: 435, title: 'Non-overlapping Intervals', slug: 'non-overlapping-intervals', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'tries',
+        title: 'Tries',
+        priority: 'Medium',
+        description: 'Vocabulary prefix trees, tokenization lookups, and dictionary-guided search pruning',
+        items: [
+          {
+            id: 'lc-208',
+            pattern: 'Prefix Tree Core Structure',
+            insight: 'Node structure with fixed child array/map and isEnd flag supporting insert, search, and startsWith.',
+            complexity: 'O(L) per op / O(total chars) space',
+            problem: { num: 208, title: 'Implement Trie (Prefix Tree)', slug: 'implement-trie-prefix-tree', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-212',
+            pattern: 'Trie-Pruned Grid Backtracking',
+            insight: 'Build a Trie from the word list, run grid DFS backtracking, and prune matched leaf nodes.',
+            complexity: 'O(M·N·4·3^(L-1)) worst-case',
+            problem: { num: 212, title: 'Word Search II', slug: 'word-search-ii', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'backtracking',
+        title: 'Backtracking',
+        priority: 'Lower',
+        description: 'Combinatorial search spaces, constraint satisfaction, and candidate generation',
+        items: [
+          {
+            id: 'lc-78',
+            pattern: 'Binary Include/Exclude Tree',
+            insight: 'Classic binary decision tree or start-index loop generating all 2^n subsets.',
+            complexity: 'O(n·2^n) time / O(n) stack',
+            problem: { num: 78, title: 'Subsets', slug: 'subsets', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-39',
+            pattern: 'Unbounded Candidate Search',
+            insight: 'Pass same index i when reusing candidates and i + 1 when skipping to avoid duplicate permutations.',
+            complexity: 'O(2^(T/m)) time / O(T/m) stack',
+            problem: { num: 39, title: 'Combination Sum', slug: 'combination-sum', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-51',
+            pattern: 'Diagonal-Set Conflict Pruning',
+            insight: 'Row-by-row backtracking with O(1) conflict checks using sets for columns, r - c, and r + c.',
+            complexity: 'O(n!) time / O(n²) space',
+            problem: { num: 51, title: 'N-Queens', slug: 'n-queens', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'recursion',
+        title: 'Recursion',
+        priority: 'Lower',
+        description: 'Divide-and-conquer decompositions, fast exponentiation, and recursive subproblem synthesis',
+        items: [
+          {
+            id: 'lc-50',
+            pattern: 'Binary Exponentiation',
+            insight: 'Split x^n into (x^(n/2))² recursively while handling negative exponents safely.',
+            complexity: 'O(log n) time / O(log n) stack',
+            problem: { num: 50, title: 'Pow(x, n)', slug: 'powx-n', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-779',
+            pattern: 'Parent-Index Derivation',
+            insight: 'Derive the value directly from its parent at row n - 1 and index ceil(k / 2) without building strings.',
+            complexity: 'O(n) time / O(n) stack',
+            problem: { num: 779, title: 'K-th Symbol in Grammar', slug: 'k-th-symbol-in-grammar', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-241',
+            pattern: 'Divide-and-Conquer Cartesian Product',
+            insight: 'Split at every operator and take the Cartesian product of left and right sub-results.',
+            complexity: 'Catalan O(C_n) time & space',
+            problem: { num: 241, title: 'Different Ways to Add Parentheses', slug: 'different-ways-to-add-parentheses', difficulty: 'Medium' }
+          }
+        ]
+      },
+      {
+        id: 'linked-lists',
+        title: 'Linked Lists',
+        priority: 'Lower',
+        description: 'Pointer manipulation, cycle detection, and O(1) cache eviction data structures',
+        items: [
+          {
+            id: 'lc-206',
+            pattern: 'Three-Pointer Rewiring',
+            insight: 'Rewire curr.next = prev cleanly using prev, curr, next (iterative & recursive).',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 206, title: 'Reverse Linked List', slug: 'reverse-linked-list', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-141',
+            pattern: "Floyd's Fast & Slow Pointers",
+            insight: 'Fast and slow pointers meet inside the cycle if and only if a loop exists.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 141, title: 'Linked List Cycle', slug: 'linked-list-cycle', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-146',
+            pattern: 'Hash Map + Doubly Linked List',
+            insight: 'Combine key-to-node hash map with sentinel doubly linked list for O(1) eviction and promotion.',
+            complexity: 'O(1) per op / O(C) space',
+            problem: { num: 146, title: 'LRU Cache', slug: 'lru-cache', difficulty: 'Medium' }
+          },
+          {
+            id: 'lc-23',
+            pattern: 'K-Way Min-Heap Merge',
+            insight: "Push each list's head into a size-k min-heap (or merge pairs via divide-and-conquer).",
+            complexity: 'O(N log k) time / O(k) space',
+            problem: { num: 23, title: 'Merge k Sorted Lists', slug: 'merge-k-sorted-lists', difficulty: 'Hard' }
+          }
+        ]
+      },
+      {
+        id: 'bit-manipulation',
+        title: 'Bit Manipulation',
+        priority: 'Lower',
+        description: 'Low-level bitwise XOR cancellation, bitmasking, and hardware-efficient arithmetic',
+        items: [
+          {
+            id: 'lc-136',
+            pattern: 'XOR Pair Cancellation',
+            insight: 'XOR all elements together; duplicate pairs cancel out via a ⊕ a = 0 and a ⊕ 0 = a.',
+            complexity: 'O(n) time / O(1) space',
+            problem: { num: 136, title: 'Single Number', slug: 'single-number', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-191',
+            pattern: "Brian Kernighan's Algorithm",
+            insight: 'Repeatedly apply n &= (n - 1) to clear the lowest set bit in O(set bits).',
+            complexity: 'O(1) time / O(1) space',
+            problem: { num: 191, title: 'Number of 1 Bits', slug: 'number-of-1-bits', difficulty: 'Easy' }
+          },
+          {
+            id: 'lc-371',
+            pattern: 'Bitwise Sum & Carry Loop',
+            insight: 'Add without +/- by iterating sum = a ^ b and carry = (a & b) << 1 until carry == 0.',
+            complexity: 'O(1) time / O(1) space',
+            problem: { num: 371, title: 'Sum of Two Integers', slug: 'sum-of-two-integers', difficulty: 'Medium' }
+          }
+        ]
+      }
+    ];
+
+    // Fast topic lookup structures
+    const TOPIC_MAP = new Map(DEFAULT_TOPICS.map((t) => [t.id, t]));
+    const DEFAULT_TOPIC_IDS = DEFAULT_TOPICS.map((t) => t.id);
+
+    // SVG Circular Progress Ring Geometry Constants (32x32 viewBox, r=13.5)
+    const RING_RADIUS = 13.5;
+    const RING_CIRCUMFERENCE = +(2 * Math.PI * RING_RADIUS).toFixed(3);
+
+    // Persistence Keys
+    const KEY_COMPLETED = 'dsa_roadmap_completed_v1';
+    const KEY_TOPIC_ORDER = 'dsa_roadmap_topic_order_v2';
+    const KEY_COLLAPSED = 'dsa_roadmap_collapsed_v1';
+    const KEY_THEME = 'dsa_roadmap_theme_v1';
+
+    // Application State
+    let completedSet = new Set();
+    let collapsedSet = new Set();
+    let topicOrder = [...DEFAULT_TOPIC_IDS];
+    let statusFilter = 'all';     // 'all' | 'pending' | 'completed'
+    let difficultyFilter = 'all'; // 'all' | 'Easy' | 'Medium' | 'Hard'
+    let toastTimer = null;
+    let draggedTopicId = null;
+
+    /**
+     * Safely save a JSON-serialized value to localStorage.
+     */
+    function persistKey(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (err) {
+        // Ignore storage write errors in restricted contexts
+      }
+    }
+
+    /**
+     * Load saved problem completions, collapsed sections, and custom topic order.
+     */
+    function loadState() {
+      try {
+        const savedCompleted = localStorage.getItem(KEY_COMPLETED);
+        if (savedCompleted) {
+          const parsed = JSON.parse(savedCompleted);
+          if (Array.isArray(parsed)) {
+            completedSet = new Set(parsed);
+          }
+        }
+
+        const savedCollapsed = localStorage.getItem(KEY_COLLAPSED);
+        if (savedCollapsed) {
+          const parsedCollapsed = JSON.parse(savedCollapsed);
+          if (Array.isArray(parsedCollapsed)) {
+            collapsedSet = new Set(parsedCollapsed);
+          }
+        }
+
+        const savedOrder = localStorage.getItem(KEY_TOPIC_ORDER);
+        if (savedOrder) {
+          const parsedOrder = JSON.parse(savedOrder);
+          if (Array.isArray(parsedOrder)) {
+            const validIds = parsedOrder.filter((id) => TOPIC_MAP.has(id));
+            const seen = new Set(validIds);
+            DEFAULT_TOPIC_IDS.forEach((id) => {
+              if (!seen.has(id)) {
+                validIds.push(id);
+              }
+            });
+            if (validIds.length === DEFAULT_TOPIC_IDS.length) {
+              topicOrder = validIds;
+            }
+          }
+        }
+      } catch (err) {
+        // Fall back to default state if localStorage cannot be read
+      }
+    }
+
+    /**
+     * Initialize light/dark theme from localStorage or OS preference.
+     */
+    function initTheme() {
+      let savedTheme = null;
+      try {
+        savedTheme = localStorage.getItem(KEY_THEME);
+      } catch (err) {}
+
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', Boolean(prefersDark));
+      }
+    }
+
+    /**
+     * Toggle light/dark mode and persist selection silently.
+     */
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      try {
+        localStorage.setItem(KEY_THEME, isDark ? 'dark' : 'light');
+      } catch (err) {}
+    }
+
+    /**
+     * Return topic objects arranged in the user's current priority sequence.
+     */
+    function getOrderedTopics() {
+      return topicOrder
+        .map((id) => TOPIC_MAP.get(id))
+        .filter(Boolean);
+    }
+
+    /**
+     * Escape HTML special characters for safe rendering.
+     */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Return Tailwind badge classes for LeetCode problem difficulty.
+     */
+    function getDifficultyBadgeClasses(difficulty) {
+      if (difficulty === 'Easy') {
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/70';
+      }
+      if (difficulty === 'Medium') {
+        return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/70';
+      }
+      return 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/70';
+    }
+
+    /**
+     * Return Tailwind badge classes for DS/ML interview topic priority.
+     */
+    function getPriorityBadgeClasses(priority) {
+      if (priority === 'Core') {
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800/70';
+      }
+      if (priority === 'High') {
+        return 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/70 dark:text-violet-300 dark:border-violet-800/70';
+      }
+      if (priority === 'Medium') {
+        return 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/70';
+      }
+      return 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
+    }
+
+    /**
+     * Display a temporary toast notification in the bottom-right corner.
+     */
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      if (!toast || !toastMessage) return;
+
+      toastMessage.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 1800);
+    }
+
+    /**
+     * Build markup for one 32x32 circular SVG progress ring with centered fraction text.
+     * Hides the active arc stroke cleanly at 0% so there is never a stray dot.
+     */
+    function createProgressRingMarkup({ label, done, total, strokeHex, fillClass, trackClass, textClass }) {
+      const ratio = total > 0 ? Math.min(1, Math.max(0, done / total)) : 0;
+      const pct = Math.round(ratio * 100);
+      const offset = +(RING_CIRCUMFERENCE * (1 - ratio)).toFixed(3);
+      const isZero = done === 0;
+      const linecap = isZero ? 'butt' : 'round';
+      const arcOpacity = isZero ? '0' : '1';
+      const tooltip = `${label}: ${done}/${total} (${pct}%)`;
+
+      return `
+        <div
+          class="relative w-8 h-8 shrink-0 select-none"
+          title="${tooltip}"
+          aria-label="${tooltip}"
+        >
+          <svg class="w-full h-full -rotate-90" viewBox="0 0 32 32" aria-hidden="true">
+            <!-- Subtle Tinted Inner Fill -->
+            <circle cx="16" cy="16" r="12.25" class="${fillClass}" />
+            <!-- Background Track Ring -->
+            <circle cx="16" cy="16" r="${RING_RADIUS}" fill="none" stroke-width="2.5" class="${trackClass}" />
+            <!-- Active Progress Arc -->
+            <circle
+              cx="16"
+              cy="16"
+              r="${RING_RADIUS}"
+              fill="none"
+              stroke="${strokeHex}"
+              stroke-width="2.5"
+              stroke-linecap="${linecap}"
+              stroke-dasharray="${RING_CIRCUMFERENCE}"
+              stroke-dashoffset="${offset}"
+              opacity="${arcOpacity}"
+              style="transition: stroke-dashoffset 0.35s ease, opacity 0.2s ease;"
+            />
+          </svg>
+          <span class="absolute inset-0 flex items-center justify-center tabular-nums text-[8.5px] font-bold leading-none tracking-tighter ${textClass}">
+            ${done}/${total}
+          </span>
+        </div>
+      `;
+    }
+
+    /**
+     * Initialize the four header circular progress ring containers once,
+     * then smoothly update arc offsets and fraction labels on every change.
+     */
+    function updateHeaderRings() {
+      let totalItems = 0;
+      let completedItems = 0;
+      const diffTotals = { Easy: 0, Medium: 0, Hard: 0 };
+      const diffDone = { Easy: 0, Medium: 0, Hard: 0 };
+
+      DEFAULT_TOPICS.forEach((sec) => {
+        sec.items.forEach((item) => {
+          totalItems++;
+          const isDone = completedSet.has(item.id);
+          if (isDone) completedItems++;
+
+          const diff = item.problem.difficulty;
+          if (diffTotals[diff] !== undefined) {
+            diffTotals[diff]++;
+            if (isDone) diffDone[diff]++;
+          }
+        });
+      });
+
+      const container = document.getElementById('headerProgressRings');
+      if (!container) return;
+
+      const specs = [
+        {
+          key: 'overall',
+          label: 'Overall',
+          done: completedItems,
+          total: totalItems,
+          strokeHex: '#6366f1',
+          fillClass: 'fill-indigo-500/10 dark:fill-indigo-400/15',
+          trackClass: 'stroke-indigo-200/75 dark:stroke-indigo-950/90',
+          textClass: 'text-indigo-700 dark:text-indigo-300'
+        },
+        {
+          key: 'easy',
+          label: 'Easy',
+          done: diffDone.Easy,
+          total: diffTotals.Easy,
+          strokeHex: '#10b981',
+          fillClass: 'fill-emerald-500/10 dark:fill-emerald-400/15',
+          trackClass: 'stroke-emerald-200/75 dark:stroke-emerald-950/90',
+          textClass: 'text-emerald-700 dark:text-emerald-300'
+        },
+        {
+          key: 'medium',
+          label: 'Medium',
+          done: diffDone.Medium,
+          total: diffTotals.Medium,
+          strokeHex: '#f59e0b',
+          fillClass: 'fill-amber-500/10 dark:fill-amber-400/15',
+          trackClass: 'stroke-amber-200/75 dark:stroke-amber-950/90',
+          textClass: 'text-amber-700 dark:text-amber-300'
+        },
+        {
+          key: 'hard',
+          label: 'Hard',
+          done: diffDone.Hard,
+          total: diffTotals.Hard,
+          strokeHex: '#f43f5e',
+          fillClass: 'fill-rose-500/10 dark:fill-rose-400/15',
+          trackClass: 'stroke-rose-200/75 dark:stroke-rose-950/90',
+          textClass: 'text-rose-700 dark:text-rose-300'
+        }
+      ];
+
+      // Build ring DOM on first run so subsequent updates animate stroke-dashoffset smoothly
+      if (!container.dataset.initialized) {
+        container.innerHTML =
+          createProgressRingMarkup(specs[0]).replace('<div', '<div data-ring-key="overall"') +
+          '<span class="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 shrink-0" aria-hidden="true"></span>' +
+          createProgressRingMarkup(specs[1]).replace('<div', '<div data-ring-key="easy"') +
+          createProgressRingMarkup(specs[2]).replace('<div', '<div data-ring-key="medium"') +
+          createProgressRingMarkup(specs[3]).replace('<div', '<div data-ring-key="hard"');
+        container.dataset.initialized = 'true';
+        return;
+      }
+
+      // Smoothly update existing SVG arcs and text labels
+      specs.forEach((spec) => {
+        const wrapper = container.querySelector(`[data-ring-key="${spec.key}"]`);
+        if (!wrapper) return;
+
+        const ratio = spec.total > 0 ? Math.min(1, Math.max(0, spec.done / spec.total)) : 0;
+        const pct = Math.round(ratio * 100);
+        const offset = +(RING_CIRCUMFERENCE * (1 - ratio)).toFixed(3);
+        const isZero = spec.done === 0;
+        const tooltip = `${spec.label}: ${spec.done}/${spec.total} (${pct}%)`;
+
+        wrapper.setAttribute('title', tooltip);
+        wrapper.setAttribute('aria-label', tooltip);
+
+        const circles = wrapper.querySelectorAll('circle');
+        const arc = circles[2];
+        if (arc) {
+          arc.setAttribute('stroke-dashoffset', String(offset));
+          arc.setAttribute('stroke-linecap', isZero ? 'butt' : 'round');
+          arc.setAttribute('opacity', isZero ? '0' : '1');
+        }
+
+        const textSpan = wrapper.querySelector('span');
+        if (textSpan) {
+          textSpan.textContent = `${spec.done}/${spec.total}`;
+        }
+      });
+    }
+
+    /**
+     * Evaluate whether a problem matches active status and difficulty filters.
+     */
+    function itemMatchesFilters(item) {
+      const isDone = completedSet.has(item.id);
+      if (statusFilter === 'completed' && !isDone) return false;
+      if (statusFilter === 'pending' && isDone) return false;
+      if (difficultyFilter !== 'all' && item.problem.difficulty !== difficultyFilter) return false;
+      return true;
+    }
+
+    /**
+     * Sync visual active state on status segmented control buttons.
+     */
+    function updateStatusPillStyles() {
+      document.querySelectorAll('.status-pill').forEach((btn) => {
+        const active = btn.getAttribute('data-status-filter') === statusFilter;
+        btn.setAttribute('aria-pressed', String(active));
+        btn.className = active
+          ? 'status-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm transition-all'
+          : 'status-pill px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all';
+      });
+    }
+
+    /**
+     * Sync visual active state on difficulty segmented control buttons.
+     */
+    function updateDiffPillStyles() {
+      const activeTextByDiff = {
+        all: 'text-slate-900 dark:text-white',
+        Easy: 'text-emerald-600 dark:text-emerald-400',
+        Medium: 'text-amber-600 dark:text-amber-400',
+        Hard: 'text-rose-600 dark:text-rose-400'
+      };
+
+      document.querySelectorAll('.diff-pill').forEach((btn) => {
+        const val = btn.getAttribute('data-diff-filter');
+        const active = val === difficultyFilter;
+        const layoutCls = val === 'all' ? '' : 'inline-flex items-center gap-1.5 ';
+        btn.setAttribute('aria-pressed', String(active));
+        btn.className = active
+          ? `diff-pill ${layoutCls}px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 ${activeTextByDiff[val]} shadow-sm transition-all`
+          : `diff-pill ${layoutCls}px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all`;
+      });
+    }
+
+    /**
+     * Render all visible collapsible topic sections in the user's current sequence.
+     */
+    function renderSections() {
+      const container = document.getElementById('sectionsContainer');
+      const emptyState = document.getElementById('emptyState');
+      container.innerHTML = '';
+
+      let visibleSectionsCount = 0;
+      const orderedTopics = getOrderedTopics();
+
+      orderedTopics.forEach((sec, index) => {
+        const sequenceNum = index + 1;
+        const filteredItems = sec.items.filter(itemMatchesFilters);
+        if (filteredItems.length === 0) return;
+
+        visibleSectionsCount++;
+        const totalInSec = sec.items.length;
+        const doneInSec = sec.items.filter((i) => completedSet.has(i.id)).length;
+        const secPct = Math.round((doneInSec / totalInSec) * 100);
+        const isSectionComplete = doneInSec === totalInSec;
+        const isCollapsed = collapsedSet.has(sec.id);
+
+        const sectionEl = document.createElement('section');
+        sectionEl.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-all';
+
+        // Collapsible Section Header
+        const headerBtn = document.createElement('button');
+        headerBtn.type = 'button';
+        headerBtn.className = 'w-full text-left px-4 sm:px-6 py-4 flex items-center justify-between gap-3 sm:gap-4 bg-slate-50/70 dark:bg-slate-900/80 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 transition-colors';
+        headerBtn.setAttribute('aria-expanded', String(!isCollapsed));
+        headerBtn.addEventListener('click', () => {
+          if (collapsedSet.has(sec.id)) {
+            collapsedSet.delete(sec.id);
+          } else {
+            collapsedSet.add(sec.id);
+          }
+          persistKey(KEY_COLLAPSED, Array.from(collapsedSet));
+          renderSections();
+        });
+
+        headerBtn.innerHTML = `
+          <div class="flex items-start sm:items-center gap-3 min-w-0">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold shrink-0 ${
+              isSectionComplete
+                ? 'bg-emerald-600 text-white'
+                : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
+            }">
+              ${sequenceNum}
+            </span>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
+                  ${escapeHtml(sec.title)}
+                </h2>
+                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold border ${getPriorityBadgeClasses(sec.priority)}">
+                  ${escapeHtml(sec.priority)}
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 sm:line-clamp-1">
+                ${escapeHtml(sec.description)}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="hidden sm:flex flex-col items-end gap-1">
+              <span class="text-xs font-semibold tabular-nums ${
+                isSectionComplete
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-slate-600 dark:text-slate-300'
+              }">
+                ${doneInSec} / ${totalInSec}
+              </span>
+              <div class="w-20 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full ${isSectionComplete ? 'bg-emerald-500' : 'bg-indigo-600'} rounded-full transition-all duration-300" style="width: ${secPct}%"></div>
+              </div>
+            </div>
+            <span class="sm:hidden text-xs font-semibold tabular-nums px-2 py-0.5 rounded-md ${
+              isSectionComplete
+                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                : 'bg-slate-200/80 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+            }">
+              ${doneInSec}/${totalInSec}
+            </span>
+            <svg class="w-4 h-4 text-slate-400 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : 'rotate-0'}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        `;
+
+        sectionEl.appendChild(headerBtn);
+
+        // Problem Rows inside expanded section
+        if (!isCollapsed) {
+          const listWrapper = document.createElement('div');
+          listWrapper.className = 'divide-y divide-slate-100 dark:divide-slate-800/80 border-t border-slate-100 dark:border-slate-800';
+
+          filteredItems.forEach((item) => {
+            const isChecked = completedSet.has(item.id);
+            const prob = item.problem;
+            const probUrl = `https://leetcode.com/problems/${prob.slug}/`;
+
+            const row = document.createElement('div');
+            row.className = `px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
+              isChecked
+                ? 'bg-emerald-50/35 dark:bg-emerald-950/15'
+                : 'hover:bg-slate-50/90 dark:hover:bg-slate-800/40'
+            }`;
+
+            // Left: Accessible Checkbox + Pattern, Key Insight & Complexity
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'flex items-start gap-3.5 flex-1 min-w-0';
+
+            const checkboxBtn = document.createElement('button');
+            checkboxBtn.type = 'button';
+            checkboxBtn.setAttribute('role', 'checkbox');
+            checkboxBtn.setAttribute('aria-checked', String(isChecked));
+            checkboxBtn.setAttribute('aria-label', `Mark "${prob.title}" as ${isChecked ? 'incomplete' : 'complete'}`);
+            checkboxBtn.className = `mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 dark:focus:ring-offset-slate-900 ${
+              isChecked
+                ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
+                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-indigo-500 dark:hover:border-indigo-400'
+            }`;
+
+            checkboxBtn.innerHTML = isChecked
+              ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>`
+              : '';
+
+            const toggleItemCompletion = () => {
+              if (completedSet.has(item.id)) {
+                completedSet.delete(item.id);
+                showToast('Marked incomplete');
+              } else {
+                completedSet.add(item.id);
+                showToast('Marked complete');
+              }
+              persistKey(KEY_COMPLETED, Array.from(completedSet));
+              updateHeaderRings();
+              renderSections();
+            };
+
+            checkboxBtn.addEventListener('click', toggleItemCompletion);
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'min-w-0 flex-1 cursor-pointer select-none';
+            textDiv.addEventListener('click', toggleItemCompletion);
+
+            const complexityBadge = item.complexity
+              ? `<span class="inline-block mt-1.5 px-2 py-0.5 rounded-md font-mono text-[11px] bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 border border-slate-200/70 dark:border-slate-700/70">${escapeHtml(item.complexity)}</span>`
+              : '';
+
+            textDiv.innerHTML = `
+              <div class="text-sm font-semibold leading-snug transition-colors ${
+                isChecked
+                  ? 'line-through text-slate-400 dark:text-slate-500'
+                  : 'text-slate-800 dark:text-slate-100'
+              }">
+                ${escapeHtml(item.pattern)}
+              </div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                ${escapeHtml(item.insight)}
+              </div>
+              ${complexityBadge}
+            `;
+
+            leftDiv.appendChild(checkboxBtn);
+            leftDiv.appendChild(textDiv);
+
+            // Right: LeetCode Problem Link Pill
+            const rightDiv = document.createElement('div');
+            rightDiv.className = 'flex sm:items-end pl-9 sm:pl-0 shrink-0';
+
+            const linkEl = document.createElement('a');
+            linkEl.href = probUrl;
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener noreferrer';
+            linkEl.className = `group inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all max-w-full ${
+              isChecked
+                ? 'bg-white/70 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-500'
+                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-700 dark:hover:text-indigo-300'
+            }`;
+
+            linkEl.innerHTML = `
+              <span class="font-bold text-indigo-600 dark:text-indigo-400 shrink-0">#${prob.num}</span>
+              <span class="max-w-[180px] sm:max-w-[230px] truncate">${escapeHtml(prob.title)}</span>
+              <span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold border shrink-0 ${getDifficultyBadgeClasses(prob.difficulty)}">
+                ${escapeHtml(prob.difficulty)}
+              </span>
+              <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+              </svg>
+            `;
+
+            rightDiv.appendChild(linkEl);
+
+            row.appendChild(leftDiv);
+            row.appendChild(rightDiv);
+            listWrapper.appendChild(row);
+          });
+
+          sectionEl.appendChild(listWrapper);
+        }
+
+        container.appendChild(sectionEl);
+      });
+
+      // Toggle Empty State visibility
+      if (visibleSectionsCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Reorder a topic from fromIndex to toIndex, persist, and re-render.
+     */
+    function reorderTopics(fromIndex, toIndex) {
+      if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= topicOrder.length ||
+        toIndex >= topicOrder.length
+      ) {
+        return;
+      }
+      const [moved] = topicOrder.splice(fromIndex, 1);
+      topicOrder.splice(toIndex, 0, moved);
+      persistKey(KEY_TOPIC_ORDER, topicOrder);
+      renderOrderModalList();
+      renderSections();
+      showToast('Topic order updated');
+    }
+
+    /**
+     * Render all 24 topics inside the Topic Sequence modal
+     * with both drag-and-drop and Up/Down arrow controls.
+     */
+    function renderOrderModalList() {
+      const listEl = document.getElementById('orderListContainer');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      const orderedTopics = getOrderedTopics();
+
+      orderedTopics.forEach((topic, idx) => {
+        const isFirst = idx === 0;
+        const isLast = idx === orderedTopics.length - 1;
+        const problemCount = topic.items.length;
+
+        const row = document.createElement('div');
+        row.draggable = true;
+        row.dataset.topicId = topic.id;
+        row.className = 'group flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 hover:border-indigo-300 dark:hover:border-indigo-700/80 transition-all cursor-grab active:cursor-grabbing select-none';
+
+        // HTML5 Drag-and-Drop Handlers
+        row.addEventListener('dragstart', (e) => {
+          draggedTopicId = topic.id;
+          row.classList.add('opacity-45', 'ring-2', 'ring-indigo-400/60');
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', topic.id);
+          }
+        });
+
+        row.addEventListener('dragend', () => {
+          draggedTopicId = null;
+          row.classList.remove('opacity-45', 'ring-2', 'ring-indigo-400/60');
+          listEl.querySelectorAll('[data-topic-id]').forEach((el) => {
+            el.classList.remove('border-indigo-500', 'bg-indigo-50/80', 'dark:bg-indigo-950/50', 'ring-2', 'ring-indigo-500/40');
+          });
+        });
+
+        row.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = 'move';
+          }
+          if (draggedTopicId && draggedTopicId !== topic.id) {
+            row.classList.add('border-indigo-500', 'bg-indigo-50/80', 'dark:bg-indigo-950/50', 'ring-2', 'ring-indigo-500/40');
+          }
+        });
+
+        row.addEventListener('dragleave', () => {
+          row.classList.remove('border-indigo-500', 'bg-indigo-50/80', 'dark:bg-indigo-950/50', 'ring-2', 'ring-indigo-500/40');
+        });
+
+        row.addEventListener('drop', (e) => {
+          e.preventDefault();
+          row.classList.remove('border-indigo-500', 'bg-indigo-50/80', 'dark:bg-indigo-950/50', 'ring-2', 'ring-indigo-500/40');
+          const sourceId = draggedTopicId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+          if (!sourceId || sourceId === topic.id) return;
+
+          const fromIdx = topicOrder.indexOf(sourceId);
+          const toIdx = topicOrder.indexOf(topic.id);
+          reorderTopics(fromIdx, toIdx);
+        });
+
+        // Left: Drag Grip + Sequence Index + Topic Title & Priority Badge
+        const leftInfo = document.createElement('div');
+        leftInfo.className = 'flex items-center gap-2.5 min-w-0 flex-1';
+        leftInfo.innerHTML = `
+          <span class="text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors shrink-0" aria-hidden="true" title="Drag to reorder">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M7 4a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm6 0a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM7 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm6 0a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM7 13a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm6 0a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
+            </svg>
+          </span>
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold tabular-nums bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
+            ${idx + 1}
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                ${escapeHtml(topic.title)}
+              </span>
+              <span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold border ${getPriorityBadgeClasses(topic.priority)} shrink-0">
+                ${escapeHtml(topic.priority)}
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">
+              ${problemCount} ${problemCount === 1 ? 'problem' : 'problems'}
+            </div>
+          </div>
+        `;
+
+        // Right: Move Up / Move Down Buttons
+        const controls = document.createElement('div');
+        controls.className = 'flex items-center gap-1 shrink-0';
+
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.disabled = isFirst;
+        upBtn.setAttribute('aria-label', `Move ${topic.title} up`);
+        upBtn.title = 'Move Up';
+        upBtn.className = `p-1.5 rounded-lg border transition-colors ${
+          isFirst
+            ? 'border-slate-200/60 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700'
+        }`;
+        upBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>`;
+        upBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          reorderTopics(idx, idx - 1);
+        });
+
+        const downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.disabled = isLast;
+        downBtn.setAttribute('aria-label', `Move ${topic.title} down`);
+        downBtn.title = 'Move Down';
+        downBtn.className = `p-1.5 rounded-lg border transition-colors ${
+          isLast
+            ? 'border-slate-200/60 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700'
+        }`;
+        downBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>`;
+        downBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          reorderTopics(idx, idx + 1);
+        });
+
+        controls.appendChild(upBtn);
+        controls.appendChild(downBtn);
+
+        row.appendChild(leftInfo);
+        row.appendChild(controls);
+        listEl.appendChild(row);
+      });
+    }
+
+    /**
+     * Wire up all interactive controls, filters, modals, and keyboard shortcuts.
+     */
+    function setupEventListeners() {
+      // Theme Toggle
+      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+      // Initialize segmented filter button styles
+      updateStatusPillStyles();
+      updateDiffPillStyles();
+
+      // Status Filter Pills
+      document.querySelectorAll('.status-pill').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          statusFilter = btn.getAttribute('data-status-filter');
+          updateStatusPillStyles();
+          renderSections();
+        });
+      });
+
+      // Difficulty Filter Pills
+      document.querySelectorAll('.diff-pill').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          difficultyFilter = btn.getAttribute('data-diff-filter');
+          updateDiffPillStyles();
+          renderSections();
+        });
+      });
+
+      // Expand / Collapse All Sections
+      document.getElementById('expandAllBtn').addEventListener('click', () => {
+        collapsedSet.clear();
+        persistKey(KEY_COLLAPSED, []);
+        renderSections();
+      });
+
+      document.getElementById('collapseAllBtn').addEventListener('click', () => {
+        DEFAULT_TOPICS.forEach((s) => collapsedSet.add(s.id));
+        persistKey(KEY_COLLAPSED, Array.from(collapsedSet));
+        renderSections();
+      });
+
+      // Reset Filters (Empty State)
+      document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+        statusFilter = 'all';
+        difficultyFilter = 'all';
+        updateStatusPillStyles();
+        updateDiffPillStyles();
+        renderSections();
+      });
+
+      // Topic Order Modal Controls
+      const orderModal = document.getElementById('orderModal');
+      const openOrderModal = () => {
+        renderOrderModalList();
+        orderModal.classList.remove('hidden');
+      };
+      const closeOrderModal = () => {
+        orderModal.classList.add('hidden');
+      };
+
+      document.getElementById('openOrderModalBtn').addEventListener('click', openOrderModal);
+      document.getElementById('closeOrderModalXBtn').addEventListener('click', closeOrderModal);
+      document.getElementById('doneOrderModalBtn').addEventListener('click', closeOrderModal);
+
+      orderModal.addEventListener('click', (e) => {
+        if (e.target === orderModal) closeOrderModal();
+      });
+
+      document.getElementById('resetOrderDefaultBtn').addEventListener('click', () => {
+        topicOrder = [...DEFAULT_TOPIC_IDS];
+        persistKey(KEY_TOPIC_ORDER, topicOrder);
+        renderOrderModalList();
+        renderSections();
+        showToast('Topic order updated');
+      });
+
+      // Reset Progress Confirmation Modal Controls
+      const resetModal = document.getElementById('resetModal');
+      const closeResetModal = () => resetModal.classList.add('hidden');
+
+      document.getElementById('openResetModalBtn').addEventListener('click', () => {
+        resetModal.classList.remove('hidden');
+      });
+      document.getElementById('cancelResetBtn').addEventListener('click', closeResetModal);
+
+      resetModal.addEventListener('click', (e) => {
+        if (e.target === resetModal) closeResetModal();
+      });
+
+      document.getElementById('confirmResetBtn').addEventListener('click', () => {
+        completedSet.clear();
+        persistKey(KEY_COMPLETED, []);
+        updateHeaderRings();
+        renderSections();
+        closeResetModal();
+        showToast('Progress reset');
+      });
+
+      // Close active modals on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (!orderModal.classList.contains('hidden')) closeOrderModal();
+          if (!resetModal.classList.contains('hidden')) closeResetModal();
+        }
+      });
+    }
+
+    // Bootstrap Application
+    initTheme();
+    loadState();
+    setupEventListeners();
+    updateHeaderRings();
+    renderSections();
+  </script>
+</body>
+</html>

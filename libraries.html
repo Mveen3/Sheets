@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Libraries</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a0e14;
+      --bg-surface: #111722;
+      --bg-row-alt: rgba(255, 255, 255, 0.016);
+      --bg-row-hover: rgba(255, 255, 255, 0.042);
+      --bg-code: #0b0f17;
+      --border: #1e293b;
+      --border-strong: #2d3c54;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #7c8da6;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --syn-kw: #c084fc;
+      --syn-str: #86efac;
+      --syn-num: #fbbf24;
+      --syn-fn: #60a5fa;
+      --syn-cm: #64748b;
+      --syn-cls: #38bdf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background:
+        radial-gradient(1100px 420px at 85% -10%, rgba(56, 189, 248, 0.07), transparent 65%),
+        radial-gradient(900px 380px at 10% 0%, rgba(167, 139, 250, 0.05), transparent 65%),
+        var(--bg-base);
+      min-height: 100vh;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 9px; height: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: #26344b; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #364969; }
+
+    /* Compact Frozen Top Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 10px clamp(16px, 2.2vw, 36px);
+      background: rgba(10, 14, 20, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .top-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+      background: #172030;
+    }
+
+    .pill.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--pill-accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--pill-accent) 28%, transparent);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--pill-accent);
+    }
+
+    /* Full-width Edge-to-Edge Container */
+    .page {
+      width: 100%;
+      padding: 24px clamp(16px, 2.2vw, 36px) 72px;
+    }
+
+    /* Library Sections */
+    .lib-section {
+      width: 100%;
+      margin-bottom: 54px;
+      scroll-margin-top: 68px;
+    }
+    .lib-section:last-child {
+      margin-bottom: 0;
+    }
+    .lib-section.is-hidden {
+      display: none;
+    }
+
+    .lib-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lib-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--lib-accent);
+      background: var(--lib-soft);
+      border: 1px solid var(--lib-border);
+      padding: 4px 10px;
+      border-radius: 7px;
+    }
+
+    .lib-header h2 {
+      font-size: 25px;
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      color: #fff;
+    }
+
+    .lib-import {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: var(--lib-accent);
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      padding: 5px 12px;
+      border-radius: 7px;
+    }
+
+    /* Base Example Grid */
+    .base-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .base-grid.has-preview {
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+    }
+
+    .code-card {
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+    .base-card {
+      border-left: 3px solid var(--lib-accent);
+    }
+
+    .code-card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      background: rgba(255, 255, 255, 0.028);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots span { width: 9px; height: 9px; border-radius: 50%; }
+    .window-dots span:nth-child(1) { background: #ef4444; opacity: 0.78; }
+    .window-dots span:nth-child(2) { background: #f59e0b; opacity: 0.78; }
+    .window-dots span:nth-child(3) { background: #10b981; opacity: 0.78; }
+
+    .code-card-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .copy-btn {
+      margin-left: auto;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-strong);
+      padding: 4px 11px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { color: #fff; border-color: #64748b; background: rgba(255, 255, 255, 0.1); }
+    .copy-btn.copied { color: #4ade80; border-color: rgba(74, 222, 128, 0.45); background: rgba(74, 222, 128, 0.12); }
+
+    .code-pre {
+      padding: 15px 18px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.65;
+      color: #e2e8f0;
+    }
+
+    /* DataFrame Preview */
+    .df-preview-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .df-preview-label {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--lib-accent);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .df-preview {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+    }
+    .df-preview th, .df-preview td {
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .df-preview th {
+      color: var(--text-secondary);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .df-preview tr:last-child td { border-bottom: none; }
+    .df-preview .idx-cell { color: var(--text-muted); font-weight: 600; }
+    .df-preview .nan-cell { color: #fb7185; font-style: italic; }
+
+    /* Subgroups */
+    .subgroup {
+      margin-bottom: 28px;
+      width: 100%;
+    }
+    .subgroup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .subgroup-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .subgroup h3 {
+      font-size: 17px;
+      font-weight: 650;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .sub-import {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+
+    .context-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--lib-soft);
+      border: 1px solid var(--lib-border);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+    }
+    .context-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--lib-accent);
+      background: rgba(10, 14, 20, 0.72);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Full-Width Operations Table */
+    .table-card {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    .ops-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      table-layout: auto;
+    }
+
+    .ops-table thead th {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.025);
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .op-row {
+      border-bottom: 1px solid rgba(30, 41, 59, 0.75);
+      transition: background 0.12s ease;
+    }
+    .op-row:nth-child(even) { background: var(--bg-row-alt); }
+    .op-row:last-child { border-bottom: none; }
+    .op-row:hover { background: var(--bg-row-hover); }
+
+    .ops-table td {
+      padding: 12px 16px;
+      vertical-align: middle;
+      font-size: 14.5px;
+    }
+
+    .col-fn {
+      width: 19%;
+      white-space: nowrap;
+    }
+    .fn-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--lib-accent);
+      background: var(--lib-soft);
+      border: 1px solid var(--lib-border);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .col-desc {
+      width: 21%;
+      color: var(--text-secondary);
+      min-width: 180px;
+    }
+
+    .col-code {
+      width: 36%;
+      min-width: 280px;
+    }
+    .code-cell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-code);
+      border: 1px solid rgba(45, 60, 84, 0.78);
+      border-radius: 7px;
+      padding: 8px 10px 8px 12px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #e2e8f0;
+    }
+    .code-cell code {
+      overflow-x: auto;
+      word-break: break-word;
+    }
+
+    .copy-mini {
+      flex-shrink: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 5px;
+      opacity: 0.4;
+      transition: opacity 0.15s, color 0.15s, background 0.15s;
+    }
+    .code-cell:hover .copy-mini { opacity: 1; }
+    .copy-mini:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+    .copy-mini.copied { opacity: 1; color: #4ade80; }
+
+    .col-out {
+      width: 24%;
+      min-width: 210px;
+    }
+    .out-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      line-height: 1.45;
+      color: #a7f3d0;
+    }
+    .out-prompt {
+      color: #34d399;
+      font-weight: 700;
+      user-select: none;
+    }
+    .out-val {
+      word-break: break-word;
+    }
+
+    /* End-to-End PyTorch Step Cards */
+    .e2e-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .step-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+    }
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--lib-soft);
+      border: 1px solid var(--lib-border);
+      color: var(--lib-accent);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-meta { display: flex; flex-direction: column; min-width: 0; }
+    .step-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .step-meta code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 24px;
+      background: #162033;
+      color: #e2e8f0;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      padding: 9px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.18s ease;
+      z-index: 60;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Syntax Tokens */
+    .tok-kw { color: var(--syn-kw); }
+    .tok-str { color: var(--syn-str); }
+    .tok-num { color: var(--syn-num); }
+    .tok-fn { color: var(--syn-fn); }
+    .tok-cm { color: var(--syn-cm); font-style: italic; }
+    .tok-cls { color: var(--syn-cls); }
+
+    @media (max-width: 1024px) {
+      .base-grid.has-preview { grid-template-columns: 1fr; }
+      .e2e-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding: 10px 12px; gap: 10px; }
+      .top-divider { display: none; }
+      .page { padding: 16px 12px 56px; }
+      .ops-table thead { display: none; }
+      .ops-table, .ops-table tbody, .ops-table tr, .ops-table td { display: block; width: 100%; }
+      .op-row { padding: 12px; border-bottom: 1px solid var(--border-strong); }
+      .ops-table td { padding: 4px 0; }
+      .col-fn, .col-desc, .col-code, .col-out { width: 100%; min-width: 0; white-space: normal; }
+      .e2e-steps { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+  
+  <svg style="display:none" aria-hidden="true">
+    <symbol id="ic-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </symbol>
+  </svg>
+
+  <header class="topbar">
+    <a href="index.html" class="pill" style="padding: 4px 10px; font-size: 11px; text-decoration: none; border-color: rgba(255,255,255,0.14);" title="Back to Index Hub">
+      ← Hub
+    </a>
+    <h1 class="top-title">Libraries</h1>
+    <span class="top-divider" aria-hidden="true"></span>
+    <nav class="filter-pills" id="filterPills" aria-label="Filter libraries">
+      <button class="pill active" data-filter="all" style="--pill-accent:#e2e8f0">All</button><button class="pill" data-filter="numpy" style="--pill-accent:#38bdf8"><span class="pill-dot"></span>NumPy</button><button class="pill" data-filter="pandas" style="--pill-accent:#a78bfa"><span class="pill-dot"></span>Pandas</button><button class="pill" data-filter="sklearn" style="--pill-accent:#fb923c"><span class="pill-dot"></span>Scikit-learn</button><button class="pill" data-filter="pytorch" style="--pill-accent:#f43f5e"><span class="pill-dot"></span>PyTorch</button><button class="pill" data-filter="matplotlib" style="--pill-accent:#34d399"><span class="pill-dot"></span>Matplotlib</button>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="lib-section" id="numpy" data-lib="numpy" style="--lib-accent:#38bdf8;--lib-soft:rgba(56, 189, 248, 0.11);--lib-border:rgba(56, 189, 248, 0.28)"><header class="lib-header"><span class="lib-num">01</span><h2>NumPy</h2><code class="lib-import">import numpy as np</code></header><div class="base-grid"><div class="code-card base-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">Base Example</span><button class="copy-btn" data-copy="import numpy as np
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])">Copy</button></div><pre class="code-pre"><code class="py-hl">import numpy as np
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])</code></pre></div></div><div class="subgroup" id="numpy-creation"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Creation &amp; Random</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.zeros() / ones()</span></td><td class="col-desc">Array filled with 0s or 1s</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.zeros((2, 2))</code><button class="copy-mini" data-copy="np.zeros((2, 2))" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[0., 0.], [0., 0.]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.arange()</span></td><td class="col-desc">Evenly spaced values by step</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.arange(0, 10, 2)</code><button class="copy-mini" data-copy="np.arange(0, 10, 2)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0, 2, 4, 6, 8]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.linspace()</span></td><td class="col-desc">n evenly spaced values (inclusive)</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.linspace(0, 1, 5)</code><button class="copy-mini" data-copy="np.linspace(0, 1, 5)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0., 0.25, 0.5, 0.75, 1.]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.random.seed() / randn()</span></td><td class="col-desc">Fix seed / standard normal N(0,1)</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.random.seed(42); np.random.randn(2)</code><button class="copy-mini" data-copy="np.random.seed(42); np.random.randn(2)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0.4967, -0.1383]</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="numpy-shape"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Shape, Indexing &amp; Filtering</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on a, b)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">a.shape / a.dtype</span></td><td class="col-desc">Dimensions / data type</td><td class="col-code"><div class="code-cell"><code class="py-hl">a.shape, a.dtype</code><button class="copy-mini" data-copy="a.shape, a.dtype" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(2, 2), int64</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">a.reshape()</span></td><td class="col-desc">Change shape (-1 auto-infers)</td><td class="col-code"><div class="code-cell"><code class="py-hl">a.reshape(-1, 1)</code><button class="copy-mini" data-copy="a.reshape(-1, 1)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[1], [2], [3], [4]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">a.T</span></td><td class="col-desc">Transpose matrix</td><td class="col-code"><div class="code-cell"><code class="py-hl">a.T</code><button class="copy-mini" data-copy="a.T" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[1, 3], [2, 4]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">a[cond]</span></td><td class="col-desc">Boolean mask filtering</td><td class="col-code"><div class="code-cell"><code class="py-hl">a[a &gt; 2]</code><button class="copy-mini" data-copy="a[a &gt; 2]" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[3, 4]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.where()</span></td><td class="col-desc">Element-wise if-else</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.where(a &gt; 2, 1, 0)</code><button class="copy-mini" data-copy="np.where(a &gt; 2, 1, 0)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[0, 0], [1, 1]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.concatenate()</span></td><td class="col-desc">Join arrays along an axis</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.concatenate([a, b], axis=0)</code><button class="copy-mini" data-copy="np.concatenate([a, b], axis=0)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[1, 2], [3, 4], [5, 6], [7, 8]]</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="numpy-math"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Math &amp; Aggregation</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on a, b)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">a.sum() / mean() / std()</span></td><td class="col-desc">Aggregate (axis=0 cols, 1 rows)</td><td class="col-code"><div class="code-cell"><code class="py-hl">a.sum(axis=0) / a.mean(axis=1)</code><button class="copy-mini" data-copy="a.sum(axis=0) / a.mean(axis=1)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[4, 6] / [1.5, 3.5]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.argmax() / argmin()</span></td><td class="col-desc">Index of max / min value</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.argmax(a, axis=1)</code><button class="copy-mini" data-copy="np.argmax(a, axis=1)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[1, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">a @ b / np.dot()</span></td><td class="col-desc">Matrix multiplication</td><td class="col-code"><div class="code-cell"><code class="py-hl">a @ b</code><button class="copy-mini" data-copy="a @ b" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[19, 22], [43, 50]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.unique()</span></td><td class="col-desc">Unique values and counts</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.unique([1, 2, 2, 3], return_counts=True)</code><button class="copy-mini" data-copy="np.unique([1, 2, 2, 3], return_counts=True)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">([1, 2, 3], [1, 2, 1])</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.clip()</span></td><td class="col-desc">Cap values within [min, max]</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.clip(a, 2, 3)</code><button class="copy-mini" data-copy="np.clip(a, 2, 3)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[2, 2], [3, 3]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">np.isnan()</span></td><td class="col-desc">Detect NaN values</td><td class="col-code"><div class="code-cell"><code class="py-hl">np.isnan(np.array([1.0, np.nan])).sum()</code><button class="copy-mini" data-copy="np.isnan(np.array([1.0, np.nan])).sum()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">1</code></div></td></tr></tbody></table></div></div></section><section class="lib-section" id="pandas" data-lib="pandas" style="--lib-accent:#a78bfa;--lib-soft:rgba(167, 139, 250, 0.11);--lib-border:rgba(167, 139, 250, 0.28)"><header class="lib-header"><span class="lib-num">02</span><h2>Pandas</h2><code class="lib-import">import pandas as pd</code></header><div class="base-grid has-preview"><div class="code-card base-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">Base Example</span><button class="copy-btn" data-copy="import pandas as pd, numpy as np
+df = pd.DataFrame({
+    &quot;name&quot;: [&quot;Ali&quot;, &quot;Bo&quot;, &quot;Cy&quot;, &quot;Bo&quot;],
+    &quot;dept&quot;: [&quot;ML&quot;,  &quot;DS&quot;, &quot;ML&quot;, &quot;DS&quot;],
+    &quot;age&quot;:  [24,    30,   np.nan, 30],
+    &quot;sal&quot;:  [80,    100,  90,   100]
+})">Copy</button></div><pre class="code-pre"><code class="py-hl">import pandas as pd, numpy as np
+df = pd.DataFrame({
+    &quot;name&quot;: [&quot;Ali&quot;, &quot;Bo&quot;, &quot;Cy&quot;, &quot;Bo&quot;],
+    &quot;dept&quot;: [&quot;ML&quot;,  &quot;DS&quot;, &quot;ML&quot;, &quot;DS&quot;],
+    &quot;age&quot;:  [24,    30,   np.nan, 30],
+    &quot;sal&quot;:  [80,    100,  90,   100]
+})</code></pre></div><div class="df-preview-wrap"><div class="df-preview-label">DataFrame Preview (4 &times; 4)</div><table class="df-preview"><thead><tr><th></th><th>name</th><th>dept</th><th>age</th><th>sal</th></tr></thead><tbody><tr><td class="idx-cell">0</td><td class="">Ali</td><td class="">ML</td><td class="">24.0</td><td class="">80</td></tr><tr><td class="idx-cell">1</td><td class="">Bo</td><td class="">DS</td><td class="">30.0</td><td class="">100</td></tr><tr><td class="idx-cell">2</td><td class="">Cy</td><td class="">ML</td><td class="nan-cell">NaN</td><td class="">90</td></tr><tr><td class="idx-cell">3</td><td class="">Bo</td><td class="">DS</td><td class="">30.0</td><td class="">100</td></tr></tbody></table></div></div><div class="subgroup" id="pandas-load"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Load &amp; Inspect</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on df)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">pd.read_csv()</span></td><td class="col-desc">Load CSV into DataFrame</td><td class="col-code"><div class="code-cell"><code class="py-hl">df = pd.read_csv(&quot;data.csv&quot;)</code><button class="copy-mini" data-copy="df = pd.read_csv(&quot;data.csv&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">DataFrame object</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.head() / df.shape</span></td><td class="col-desc">First n rows / (rows, cols)</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.shape</code><button class="copy-mini" data-copy="df.shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(4, 4)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.info() / describe()</span></td><td class="col-desc">Dtypes &amp; nulls / numeric stats</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[&quot;sal&quot;].describe()</code><button class="copy-mini" data-copy="df[&quot;sal&quot;].describe()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">count=4, mean=92.5, min=80, max=100</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">s.value_counts()</span></td><td class="col-desc">Frequency (or %) of values</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[&quot;dept&quot;].value_counts(normalize=True)</code><button class="copy-mini" data-copy="df[&quot;dept&quot;].value_counts(normalize=True)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">ML: 0.5, DS: 0.5</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="pandas-select"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Select, Filter &amp; Sort</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on df)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.loc[]</span></td><td class="col-desc">Select by label / condition</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.loc[df[&quot;age&quot;] &gt; 25, [&quot;name&quot;, &quot;sal&quot;]]</code><button class="copy-mini" data-copy="df.loc[df[&quot;age&quot;] &gt; 25, [&quot;name&quot;, &quot;sal&quot;]]" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Rows 1 &amp; 3 (Bo, 100)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.iloc[]</span></td><td class="col-desc">Select by integer index</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.iloc[:2, :2]</code><button class="copy-mini" data-copy="df.iloc[:2, :2]" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Rows 0–1, cols name, dept</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df[cond]</span></td><td class="col-desc">Filter rows (&amp; and, | or, ~ not)</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[(df[&quot;dept&quot;] == &quot;ML&quot;) &amp; (df[&quot;sal&quot;] &gt;= 85)]</code><button class="copy-mini" data-copy="df[(df[&quot;dept&quot;] == &quot;ML&quot;) &amp; (df[&quot;sal&quot;] &gt;= 85)]" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Row 2 (Cy, ML, NaN, 90)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.sort_values()</span></td><td class="col-desc">Sort rows by column</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.sort_values(&quot;sal&quot;, ascending=False)[&quot;name&quot;].tolist()</code><button class="copy-mini" data-copy="df.sort_values(&quot;sal&quot;, ascending=False)[&quot;name&quot;].tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[&#x27;Bo&#x27;, &#x27;Bo&#x27;, &#x27;Cy&#x27;, &#x27;Ali&#x27;]</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="pandas-clean"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Clean &amp; Transform</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on df)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.isna().sum()</span></td><td class="col-desc">Count missing values per col</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.isna().sum().to_dict()</code><button class="copy-mini" data-copy="df.isna().sum().to_dict()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">{&#x27;name&#x27;: 0, &#x27;dept&#x27;: 0, &#x27;age&#x27;: 1, &#x27;sal&#x27;: 0}</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.fillna() / dropna()</span></td><td class="col-desc">Impute or drop missing rows</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[&quot;age&quot;].fillna(df[&quot;age&quot;].median()).tolist()</code><button class="copy-mini" data-copy="df[&quot;age&quot;].fillna(df[&quot;age&quot;].median()).tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[24.0, 30.0, 30.0, 30.0]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.drop_duplicates()</span></td><td class="col-desc">Remove duplicate rows</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.drop_duplicates(subset=[&quot;name&quot;]).shape</code><button class="copy-mini" data-copy="df.drop_duplicates(subset=[&quot;name&quot;]).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(3, 4) (drops row 3)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.drop() / rename()</span></td><td class="col-desc">Remove or rename columns</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.drop(columns=[&quot;age&quot;]).columns.tolist()</code><button class="copy-mini" data-copy="df.drop(columns=[&quot;age&quot;]).columns.tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[&#x27;name&#x27;, &#x27;dept&#x27;, &#x27;sal&#x27;]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">s.astype()</span></td><td class="col-desc">Cast column data type</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[&quot;sal&quot;].astype(float).tolist()</code><button class="copy-mini" data-copy="df[&quot;sal&quot;].astype(float).tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[80.0, 100.0, 90.0, 100.0]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">s.map() / s.apply()</span></td><td class="col-desc">Map dict / apply function</td><td class="col-code"><div class="code-cell"><code class="py-hl">df[&quot;dept&quot;].map({&quot;ML&quot;: 1, &quot;DS&quot;: 0}).tolist()</code><button class="copy-mini" data-copy="df[&quot;dept&quot;].map({&quot;ML&quot;: 1, &quot;DS&quot;: 0}).tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[1, 0, 1, 0]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">pd.get_dummies()</span></td><td class="col-desc">One-hot encode categories</td><td class="col-code"><div class="code-cell"><code class="py-hl">pd.get_dummies(df[[&quot;dept&quot;]], drop_first=True)</code><button class="copy-mini" data-copy="pd.get_dummies(df[[&quot;dept&quot;]], drop_first=True)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Col dept_ML: [True, False, True, False]</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="pandas-group"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Group &amp; Combine</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on df)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.groupby().agg()</span></td><td class="col-desc">Group and aggregate</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.groupby(&quot;dept&quot;)[&quot;sal&quot;].agg([&quot;mean&quot;, &quot;count&quot;])</code><button class="copy-mini" data-copy="df.groupby(&quot;dept&quot;)[&quot;sal&quot;].agg([&quot;mean&quot;, &quot;count&quot;])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">DS: (100.0, 2), ML: (85.0, 2)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.merge()</span></td><td class="col-desc">SQL join (inner, left, outer)</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.merge(pd.DataFrame({&quot;dept&quot;:[&quot;ML&quot;],&quot;b&quot;:[10]}), on=&quot;dept&quot;, how=&quot;left&quot;)[&quot;b&quot;].tolist()</code><button class="copy-mini" data-copy="df.merge(pd.DataFrame({&quot;dept&quot;:[&quot;ML&quot;],&quot;b&quot;:[10]}), on=&quot;dept&quot;, how=&quot;left&quot;)[&quot;b&quot;].tolist()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[10.0, nan, 10.0, nan]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">pd.concat()</span></td><td class="col-desc">Stack DataFrames (axis=0 rows)</td><td class="col-code"><div class="code-cell"><code class="py-hl">pd.concat([df.iloc[:2], df.iloc[2:]], axis=0).shape</code><button class="copy-mini" data-copy="pd.concat([df.iloc[:2], df.iloc[2:]], axis=0).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(4, 4)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">df.pivot_table()</span></td><td class="col-desc">2D summary table</td><td class="col-code"><div class="code-cell"><code class="py-hl">df.pivot_table(index=&quot;dept&quot;, values=&quot;sal&quot;, aggfunc=&quot;mean&quot;)</code><button class="copy-mini" data-copy="df.pivot_table(index=&quot;dept&quot;, values=&quot;sal&quot;, aggfunc=&quot;mean&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">DS: 100.0, ML: 85.0</code></div></td></tr></tbody></table></div></div></section><section class="lib-section" id="sklearn" data-lib="sklearn" style="--lib-accent:#fb923c;--lib-soft:rgba(251, 146, 60, 0.11);--lib-border:rgba(251, 146, 60, 0.28)"><header class="lib-header"><span class="lib-num">03</span><h2>Scikit-learn</h2><code class="lib-import">sklearn</code></header><div class="base-grid"><div class="code-card base-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">Base Example</span><button class="copy-btn" data-copy="X = np.array([[1, 10], [2, 20], [3, 30], [10, 100], [11, 110], [12, 120]])
+y = np.array([0, 0, 0, 1, 1, 1])  # 6 samples, 2 features, binary label">Copy</button></div><pre class="code-pre"><code class="py-hl">X = np.array([[1, 10], [2, 20], [3, 30], [10, 100], [11, 110], [12, 120]])
+y = np.array([0, 0, 0, 1, 1, 1])  # 6 samples, 2 features, binary label</code></pre></div></div><div class="subgroup" id="sklearn-prep"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Split, Preprocess &amp; Tune</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Class</th><th>What it does</th><th>Code (on X, y)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">train_test_split</span></td><td class="col-desc">Split data (stratify keeps ratio)</td><td class="col-code"><div class="code-cell"><code class="py-hl">X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.33, stratify=y, random_state=42)</code><button class="copy-mini" data-copy="X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.33, stratify=y, random_state=42)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">y_tr: [0, 0, 1, 1], y_te: [0, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">StandardScaler</span></td><td class="col-desc">Scale to mean 0, std 1</td><td class="col-code"><div class="code-cell"><code class="py-hl">StandardScaler().fit_transform(X_tr)</code><button class="copy-mini" data-copy="StandardScaler().fit_transform(X_tr)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Mean 0.0, std 1.0 per col</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">SimpleImputer</span></td><td class="col-desc">Fill missing values</td><td class="col-code"><div class="code-cell"><code class="py-hl">SimpleImputer(strategy=&quot;median&quot;).fit_transform([[1], [np.nan], [5]])</code><button class="copy-mini" data-copy="SimpleImputer(strategy=&quot;median&quot;).fit_transform([[1], [np.nan], [5]])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[1.], [3.], [5.]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">OneHotEncoder</span></td><td class="col-desc">Encode categories safely</td><td class="col-code"><div class="code-cell"><code class="py-hl">OneHotEncoder(sparse_output=False, handle_unknown=&quot;ignore&quot;).fit_transform([[&quot;ML&quot;], [&quot;DS&quot;]])</code><button class="copy-mini" data-copy="OneHotEncoder(sparse_output=False, handle_unknown=&quot;ignore&quot;).fit_transform([[&quot;ML&quot;], [&quot;DS&quot;]])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[0., 1.], [1., 0.]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ColumnTransformer</span></td><td class="col-desc">Different transforms per col</td><td class="col-code"><div class="code-cell"><code class="py-hl">ColumnTransformer([(&quot;num&quot;, StandardScaler(), [0, 1])])</code><button class="copy-mini" data-copy="ColumnTransformer([(&quot;num&quot;, StandardScaler(), [0, 1])])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Scales only cols 0 &amp; 1</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">Pipeline</span></td><td class="col-desc">Chain steps (prevents leakage)</td><td class="col-code"><div class="code-cell"><code class="py-hl">pipe = Pipeline([(&quot;sc&quot;, StandardScaler()), (&quot;clf&quot;, LogisticRegression())]).fit(X_tr, y_tr)</code><button class="copy-mini" data-copy="pipe = Pipeline([(&quot;sc&quot;, StandardScaler()), (&quot;clf&quot;, LogisticRegression())]).fit(X_tr, y_tr)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">pipe.predict(X_te) -&gt; [0, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">cross_val_score</span></td><td class="col-desc">K-fold CV scores</td><td class="col-code"><div class="code-cell"><code class="py-hl">cross_val_score(pipe, X, y, cv=3, scoring=&quot;accuracy&quot;)</code><button class="copy-mini" data-copy="cross_val_score(pipe, X, y, cv=3, scoring=&quot;accuracy&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[1., 1., 1.]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">GridSearchCV</span></td><td class="col-desc">Hyperparameter search with CV</td><td class="col-code"><div class="code-cell"><code class="py-hl">GridSearchCV(LogisticRegression(), {&quot;C&quot;: [0.1, 1, 10]}, cv=3).fit(X, y).best_params_</code><button class="copy-mini" data-copy="GridSearchCV(LogisticRegression(), {&quot;C&quot;: [0.1, 1, 10]}, cv=3).fit(X, y).best_params_" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">{&#x27;C&#x27;: 0.1}</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="sklearn-models"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Core Models</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Model Class</th><th>Use Case</th><th>Code (on X, y)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">LinearRegression / Ridge</span></td><td class="col-desc">Regression / L2 regression</td><td class="col-code"><div class="code-cell"><code class="py-hl">LinearRegression().fit(X, [2,4,6,20,22,24]).predict([[5, 50]])</code><button class="copy-mini" data-copy="LinearRegression().fit(X, [2,4,6,20,22,24]).predict([[5, 50]])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[10.]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">LogisticRegression</span></td><td class="col-desc">Linear classification baseline</td><td class="col-code"><div class="code-cell"><code class="py-hl">LogisticRegression().fit(X_tr, y_tr).predict(X_te)</code><button class="copy-mini" data-copy="LogisticRegression().fit(X_tr, y_tr).predict(X_te)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">RandomForestClassifier</span></td><td class="col-desc">Bagged decision trees</td><td class="col-code"><div class="code-cell"><code class="py-hl">RandomForestClassifier(n_estimators=50, random_state=42).fit(X_tr, y_tr).predict(X_te)</code><button class="copy-mini" data-copy="RandomForestClassifier(n_estimators=50, random_state=42).fit(X_tr, y_tr).predict(X_te)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">HistGradientBoostingClassifier</span></td><td class="col-desc">Fast boosted trees (handles NaNs)</td><td class="col-code"><div class="code-cell"><code class="py-hl">HistGradientBoostingClassifier(min_samples_leaf=1).fit(X_tr, y_tr).predict(X_te)</code><button class="copy-mini" data-copy="HistGradientBoostingClassifier(min_samples_leaf=1).fit(X_tr, y_tr).predict(X_te)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">KMeans</span></td><td class="col-desc">Unsupervised clustering</td><td class="col-code"><div class="code-cell"><code class="py-hl">KMeans(n_clusters=2, n_init=&quot;auto&quot;, random_state=42).fit_predict(X)</code><button class="copy-mini" data-copy="KMeans(n_clusters=2, n_init=&quot;auto&quot;, random_state=42).fit_predict(X)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[0, 0, 0, 1, 1, 1]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">PCA</span></td><td class="col-desc">Dimensionality reduction</td><td class="col-code"><div class="code-cell"><code class="py-hl">PCA(n_components=1).fit_transform(X).shape</code><button class="copy-mini" data-copy="PCA(n_components=1).fit_transform(X).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(6, 1)</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="sklearn-metrics"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Key Metrics</h3><code class="sub-import">from sklearn.metrics import ...</code></div></div><div class="context-strip"><span class="context-tag">BASE VECTORS</span><code class="py-hl">y_true = [0, 1, 1, 0]   |   y_pred = [0, 1, 0, 0]   |   y_prob = [0.1, 0.9, 0.4, 0.2]</code></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function</th><th>What it does</th><th>Code</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">accuracy_score</span></td><td class="col-desc">Fraction of correct predictions</td><td class="col-code"><div class="code-cell"><code class="py-hl">accuracy_score(y_true, y_pred)</code><button class="copy-mini" data-copy="accuracy_score(y_true, y_pred)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">0.75 (3/4 correct)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">f1_score</span></td><td class="col-desc">Harmonic mean of prec &amp; recall</td><td class="col-code"><div class="code-cell"><code class="py-hl">f1_score(y_true, y_pred)</code><button class="copy-mini" data-copy="f1_score(y_true, y_pred)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">0.667 (P=1.0, R=0.5)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">roc_auc_score</span></td><td class="col-desc">Ranking quality (needs probs)</td><td class="col-code"><div class="code-cell"><code class="py-hl">roc_auc_score(y_true, y_prob)</code><button class="copy-mini" data-copy="roc_auc_score(y_true, y_prob)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">1.0</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">confusion_matrix</span></td><td class="col-desc">[[TN, FP], [FN, TP]] counts</td><td class="col-code"><div class="code-cell"><code class="py-hl">confusion_matrix(y_true, y_pred)</code><button class="copy-mini" data-copy="confusion_matrix(y_true, y_pred)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[2, 0], [1, 1]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">classification_report</span></td><td class="col-desc">Precision, recall, F1 per class</td><td class="col-code"><div class="code-cell"><code class="py-hl">print(classification_report(y_true, y_pred))</code><button class="copy-mini" data-copy="print(classification_report(y_true, y_pred))" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Per-class table</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">mean_squared_error / r2_score</span></td><td class="col-desc">Regression error / variance explained</td><td class="col-code"><div class="code-cell"><code class="py-hl">mean_squared_error([2., 4.], [2.5, 3.5]) / r2_score(...)</code><button class="copy-mini" data-copy="mean_squared_error([2., 4.], [2.5, 3.5]) / r2_score(...)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">0.25 / 0.75</code></div></td></tr></tbody></table></div></div></section><section class="lib-section" id="pytorch" data-lib="pytorch" style="--lib-accent:#f43f5e;--lib-soft:rgba(244, 63, 94, 0.11);--lib-border:rgba(244, 63, 94, 0.28)"><header class="lib-header"><span class="lib-num">04</span><h2>PyTorch</h2><code class="lib-import">import torch, torch.nn as nn</code></header><div class="base-grid"><div class="code-card base-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">Base Example</span><button class="copy-btn" data-copy="import torch, torch.nn as nn
+x = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])  # shape (2, 3): batch=2, feat=3
+y = torch.tensor([0, 1])                               # class labels">Copy</button></div><pre class="code-pre"><code class="py-hl">import torch, torch.nn as nn
+x = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])  # shape (2, 3): batch=2, feat=3
+y = torch.tensor([0, 1])                               # class labels</code></pre></div></div><div class="subgroup" id="pytorch-tensors"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Tensors &amp; Shapes</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on x)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.shape / x.dtype</span></td><td class="col-desc">Dimensions / data type</td><td class="col-code"><div class="code-cell"><code class="py-hl">x.shape, x.dtype</code><button class="copy-mini" data-copy="x.shape, x.dtype" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">torch.Size([2, 3]), torch.float32</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.to(device)</span></td><td class="col-desc">Move tensor/model to GPU or CPU</td><td class="col-code"><div class="code-cell"><code class="py-hl">x = x.to(&quot;cuda&quot;)</code><button class="copy-mini" data-copy="x = x.to(&quot;cuda&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Tensor on GPU (cuda:0)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.view() / reshape()</span></td><td class="col-desc">Change shape</td><td class="col-code"><div class="code-cell"><code class="py-hl">x.reshape(-1)</code><button class="copy-mini" data-copy="x.reshape(-1)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">tensor([1., 2., 3., 4., 5., 6.])</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.unsqueeze() / squeeze()</span></td><td class="col-desc">Add / remove dim of size 1</td><td class="col-code"><div class="code-cell"><code class="py-hl">x.unsqueeze(0).shape / .squeeze(0).shape</code><button class="copy-mini" data-copy="x.unsqueeze(0).shape / .squeeze(0).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(1, 2, 3) / (2, 3)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.permute()</span></td><td class="col-desc">Reorder dimensions</td><td class="col-code"><div class="code-cell"><code class="py-hl">x.permute(1, 0)</code><button class="copy-mini" data-copy="x.permute(1, 0)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[1., 4.], [2., 5.], [3., 6.]] (3, 2)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">torch.cat() / stack()</span></td><td class="col-desc">Join along existing / new dim</td><td class="col-code"><div class="code-cell"><code class="py-hl">torch.cat([x, x], dim=0).shape / stack(...).shape</code><button class="copy-mini" data-copy="torch.cat([x, x], dim=0).shape / stack(...).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">(4, 3) / (2, 2, 3)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">x.detach().cpu().numpy()</span></td><td class="col-desc">Convert to NumPy (no grad)</td><td class="col-code"><div class="code-cell"><code class="py-hl">x.detach().cpu().numpy()</code><button class="copy-mini" data-copy="x.detach().cpu().numpy()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">array([[1., 2., 3.], [4., 5., 6.]])</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="pytorch-layers"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Data, Layers, Loss &amp; Optimizers</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Class / Method</th><th>What it does</th><th>Code (on x, y)</th><th>Actual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">DataLoader</span></td><td class="col-desc">Batch and shuffle dataset</td><td class="col-code"><div class="code-cell"><code class="py-hl">DataLoader(list(zip(x, y)), batch_size=1, shuffle=True)</code><button class="copy-mini" data-copy="DataLoader(list(zip(x, y)), batch_size=1, shuffle=True)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Yields 2 batches of (1, 3)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.Linear(in, out)</span></td><td class="col-desc">Fully connected layer</td><td class="col-code"><div class="code-cell"><code class="py-hl">logits = nn.Linear(3, 2)(x)</code><button class="copy-mini" data-copy="logits = nn.Linear(3, 2)(x)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Shape (2, 2) raw scores</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.Embedding(V, D)</span></td><td class="col-desc">Token-to-vector lookup</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.Embedding(10, 4)(torch.tensor([2, 5])).shape</code><button class="copy-mini" data-copy="nn.Embedding(10, 4)(torch.tensor([2, 5])).shape" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">torch.Size([2, 4])</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.ReLU()</span></td><td class="col-desc">Zero out negatives</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.ReLU()(torch.tensor([-1.0, 2.0]))</code><button class="copy-mini" data-copy="nn.ReLU()(torch.tensor([-1.0, 2.0]))" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">tensor([0., 2.])</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.Dropout(p)</span></td><td class="col-desc">Randomly zero p% (train only)</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.Dropout(0.5)(x)</code><button class="copy-mini" data-copy="nn.Dropout(0.5)(x)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">~50% zeros in .train(), unchanged in .eval()</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.LayerNorm(d)</span></td><td class="col-desc">Normalize each row (mean 0, std 1)</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.LayerNorm(3)(x)</code><button class="copy-mini" data-copy="nn.LayerNorm(3)(x)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">[[-1.22, 0., 1.22], [-1.22, 0., 1.22]]</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.CrossEntropyLoss()</span></td><td class="col-desc">Classification loss (takes raw logits)</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.CrossEntropyLoss()(logits, y)</code><button class="copy-mini" data-copy="nn.CrossEntropyLoss()(logits, y)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Scalar loss (e.g., tensor(0.62))</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">nn.MSELoss()</span></td><td class="col-desc">Regression loss</td><td class="col-code"><div class="code-cell"><code class="py-hl">nn.MSELoss()(torch.tensor([2., 4.]), torch.tensor([2.5, 3.5]))</code><button class="copy-mini" data-copy="nn.MSELoss()(torch.tensor([2., 4.]), torch.tensor([2.5, 3.5]))" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">tensor(0.2500)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">torch.optim.AdamW</span></td><td class="col-desc">Optimizer with weight decay</td><td class="col-code"><div class="code-cell"><code class="py-hl">opt = torch.optim.AdamW(model.parameters(), lr=1e-3)</code><button class="copy-mini" data-copy="opt = torch.optim.AdamW(model.parameters(), lr=1e-3)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Optimizer instance</code></div></td></tr></tbody></table></div></div><div class="subgroup" id="pytorch-train"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Training, Eval &amp; Checkpointing</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Method / Context</th><th>What it does</th><th>Code</th><th>Effect / Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">opt.zero_grad()</span></td><td class="col-desc">Clear old gradients</td><td class="col-code"><div class="code-cell"><code class="py-hl">opt.zero_grad()</code><button class="copy-mini" data-copy="opt.zero_grad()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Sets all param.grad = None</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">loss.backward()</span></td><td class="col-desc">Backprop gradients</td><td class="col-code"><div class="code-cell"><code class="py-hl">loss.backward()</code><button class="copy-mini" data-copy="loss.backward()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Populates param.grad</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">opt.step()</span></td><td class="col-desc">Update weights</td><td class="col-code"><div class="code-cell"><code class="py-hl">opt.step()</code><button class="copy-mini" data-copy="opt.step()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">w = w - lr * grad</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">model.train() / eval()</span></td><td class="col-desc">Toggle dropout &amp; batchnorm</td><td class="col-code"><div class="code-cell"><code class="py-hl">model.eval()</code><button class="copy-mini" data-copy="model.eval()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Disables dropout, freezes BN stats</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">with torch.no_grad():</span></td><td class="col-desc">Turn off autograd for eval</td><td class="col-code"><div class="code-cell"><code class="py-hl">with torch.no_grad(): out = model(x)</code><button class="copy-mini" data-copy="with torch.no_grad(): out = model(x)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Faster inference, lower memory</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">torch.save() / load_state_dict()</span></td><td class="col-desc">Save / restore weights</td><td class="col-code"><div class="code-cell"><code class="py-hl">torch.save(model.state_dict(), &quot;m.pt&quot;)</code><button class="copy-mini" data-copy="torch.save(model.state_dict(), &quot;m.pt&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Writes weights dict to m.pt</code></div></td></tr></tbody></table></div></div><div class="subgroup e2e-block" id="pytorch-e2e"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Minimal End-to-End Training Step (on x, y)</h3></div></div><div class="e2e-steps"><div class="step-card"><span class="step-num">1</span><div class="step-meta"><span class="step-title">Reset Grads</span><code class="py-hl">opt.zero_grad()</code></div></div><div class="step-card"><span class="step-num">2</span><div class="step-meta"><span class="step-title">Forward + Loss</span><code class="py-hl">criterion(model(x), y)</code></div></div><div class="step-card"><span class="step-num">3</span><div class="step-meta"><span class="step-title">Backprop</span><code class="py-hl">loss.backward()</code></div></div><div class="step-card"><span class="step-num">4</span><div class="step-meta"><span class="step-title">Update Weights</span><code class="py-hl">opt.step()</code></div></div></div><div class="code-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">train_step.py</span><button class="copy-btn" data-copy="model = nn.Sequential(nn.Linear(3, 8), nn.ReLU(), nn.Linear(8, 2))
+opt, criterion = torch.optim.AdamW(model.parameters(), lr=1e-2), nn.CrossEntropyLoss()
+
+model.train()
+opt.zero_grad()                  # 1. reset grads
+loss = criterion(model(x), y)    # 2. forward + scalar loss (e.g., 0.71)
+loss.backward()                  # 3. compute grads
+opt.step()                       # 4. update weights">Copy</button></div><pre class="code-pre"><code class="py-hl">model = nn.Sequential(nn.Linear(3, 8), nn.ReLU(), nn.Linear(8, 2))
+opt, criterion = torch.optim.AdamW(model.parameters(), lr=1e-2), nn.CrossEntropyLoss()
+
+model.train()
+opt.zero_grad()                  # 1. reset grads
+loss = criterion(model(x), y)    # 2. forward + scalar loss (e.g., 0.71)
+loss.backward()                  # 3. compute grads
+opt.step()                       # 4. update weights</code></pre></div></div></section><section class="lib-section" id="matplotlib" data-lib="matplotlib" style="--lib-accent:#34d399;--lib-soft:rgba(52, 211, 153, 0.11);--lib-border:rgba(52, 211, 153, 0.28)"><header class="lib-header"><span class="lib-num">05</span><h2>Matplotlib Essentials</h2><code class="lib-import">import matplotlib.pyplot as plt</code></header><div class="base-grid"><div class="code-card base-card"><div class="code-card-head"><div class="window-dots"><span></span><span></span><span></span></div><span class="code-card-title">Base Example</span><button class="copy-btn" data-copy="import matplotlib.pyplot as plt
+epochs = [1, 2, 3, 4]
+loss   = [0.9, 0.6, 0.4, 0.25]">Copy</button></div><pre class="code-pre"><code class="py-hl">import matplotlib.pyplot as plt
+epochs = [1, 2, 3, 4]
+loss   = [0.9, 0.6, 0.4, 0.25]</code></pre></div></div><div class="subgroup" id="matplotlib-core"><div class="subgroup-header"><div class="subgroup-title-wrap"><h3>Core Plotting API</h3></div></div><div class="table-card"><table class="ops-table"><thead><tr><th>Function / Method</th><th>What it does</th><th>Code (on epochs, loss)</th><th>Visual Output</th></tr></thead><tbody><tr class="op-row"><td class="col-fn"><span class="fn-badge">plt.subplots()</span></td><td class="col-desc">Create figure &amp; axes</td><td class="col-code"><div class="code-cell"><code class="py-hl">fig, ax = plt.subplots(figsize=(6, 4))</code><button class="copy-mini" data-copy="fig, ax = plt.subplots(figsize=(6, 4))" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Empty 6x4 in canvas</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.plot()</span></td><td class="col-desc">Line plot (loss curves, trends)</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.plot(epochs, loss, label=&quot;train&quot;)</code><button class="copy-mini" data-copy="ax.plot(epochs, loss, label=&quot;train&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Decreasing line across epochs 1–4</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.scatter()</span></td><td class="col-desc">Scatter plot (2D points)</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.scatter([1, 2, 3], [2, 4, 5], c=[0, 0, 1])</code><button class="copy-mini" data-copy="ax.scatter([1, 2, 3], [2, 4, 5], c=[0, 0, 1])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">3 dots colored by class</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.bar()</span></td><td class="col-desc">Bar chart (categories)</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.bar([&quot;ML&quot;, &quot;DS&quot;], [85, 100])</code><button class="copy-mini" data-copy="ax.bar([&quot;ML&quot;, &quot;DS&quot;], [85, 100])" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">2 bars of height 85 &amp; 100</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.hist()</span></td><td class="col-desc">Histogram (distribution)</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.hist([1, 2, 2, 3, 3, 3], bins=3)</code><button class="copy-mini" data-copy="ax.hist([1, 2, 2, 3, 3, 3], bins=3)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">3 frequency bars (1, 2, 3)</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.set()</span></td><td class="col-desc">Set title &amp; axis labels</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.set(title=&quot;Loss&quot;, xlabel=&quot;Epoch&quot;, ylabel=&quot;MSE&quot;)</code><button class="copy-mini" data-copy="ax.set(title=&quot;Loss&quot;, xlabel=&quot;Epoch&quot;, ylabel=&quot;MSE&quot;)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Adds title &amp; axis text</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">ax.legend() / tight_layout()</span></td><td class="col-desc">Show legend / fix spacing</td><td class="col-code"><div class="code-cell"><code class="py-hl">ax.legend(); plt.tight_layout()</code><button class="copy-mini" data-copy="ax.legend(); plt.tight_layout()" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Displays &quot;train&quot; box cleanly</code></div></td></tr><tr class="op-row"><td class="col-fn"><span class="fn-badge">plt.savefig() / plt.show()</span></td><td class="col-desc">Save image or display</td><td class="col-code"><div class="code-cell"><code class="py-hl">plt.savefig(&quot;loss.png&quot;, dpi=150)</code><button class="copy-mini" data-copy="plt.savefig(&quot;loss.png&quot;, dpi=150)" title="Copy snippet" aria-label="Copy code"><svg width="14" height="14"><use href="#ic-copy"/></svg></button></div></td><td class="col-out"><div class="out-cell"><span class="out-prompt">&raquo;</span><code class="out-val">Writes PNG file to disk</code></div></td></tr></tbody></table></div></div></section>
+  </main>
+  <div class="toast" id="toast">Copied to clipboard</div>
+  <script>
+    (() => {
+      const PY_KW = new Set([
+        'import', 'from', 'as', 'with', 'in', 'not', 'and', 'or',
+        'True', 'False', 'None', 'for', 'if', 'else', 'return', 'def', 'class'
+      ]);
+      const PY_CLS = new Set([
+        'DataFrame', 'StandardScaler', 'SimpleImputer', 'OneHotEncoder', 'ColumnTransformer',
+        'Pipeline', 'GridSearchCV', 'LinearRegression', 'Ridge', 'LogisticRegression',
+        'RandomForestClassifier', 'HistGradientBoostingClassifier', 'KMeans', 'PCA',
+        'DataLoader', 'Linear', 'Embedding', 'ReLU', 'Dropout', 'LayerNorm',
+        'CrossEntropyLoss', 'MSELoss', 'AdamW', 'Sequential'
+      ]);
+
+      function highlightPython(raw) {
+        const escaped = raw
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        const tokenRegex = /(#[^\n]*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(\d+(?:\.\d+)?(?:e-?\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b(?=\s*\()|\b([A-Za-z_][A-Za-z0-9_]*)\b/g;
+
+        return escaped.replace(tokenRegex, (match, comment, str, num, fn, ident) => {
+          if (comment) return `<span class="tok-cm">${comment}</span>`;
+          if (str) return `<span class="tok-str">${str}</span>`;
+          if (num) return `<span class="tok-num">${num}</span>`;
+          if (fn) {
+            if (PY_CLS.has(fn)) return `<span class="tok-cls">${fn}</span>`;
+            if (PY_KW.has(fn)) return `<span class="tok-kw">${fn}</span>`;
+            return `<span class="tok-fn">${fn}</span>`;
+          }
+          if (ident) {
+            if (PY_KW.has(ident)) return `<span class="tok-kw">${ident}</span>`;
+            if (PY_CLS.has(ident)) return `<span class="tok-cls">${ident}</span>`;
+          }
+          return match;
+        });
+      }
+
+      document.querySelectorAll('.py-hl').forEach(el => {
+        el.innerHTML = highlightPython(el.textContent);
+      });
+
+      // Library Filter Logic
+      const pills = [...document.querySelectorAll('.pill')];
+      const sections = [...document.querySelectorAll('.lib-section')];
+
+      function setFilter(filter) {
+        pills.forEach(p => p.classList.toggle('active', p.dataset.filter === filter));
+        sections.forEach(sec => {
+          sec.classList.toggle('is-hidden', filter !== 'all' && sec.dataset.lib !== filter);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      document.getElementById('filterPills').addEventListener('click', e => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        setFilter(pill.dataset.filter);
+      });
+
+      // Copy & Toast
+      const toastEl = document.getElementById('toast');
+      let toastTimer;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
+      }
+
+      async function copyText(text, btn) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        if (btn) {
+          btn.classList.add('copied');
+          const orig = btn.dataset.origText || btn.textContent;
+          if (btn.classList.contains('copy-btn')) {
+            btn.dataset.origText = orig;
+            btn.textContent = 'Copied!';
+          }
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            if (btn.classList.contains('copy-btn')) btn.textContent = orig;
+          }, 1200);
+        }
+        showToast('Copied to clipboard');
+      }
+
+      document.addEventListener('click', e => {
+        const copyBtn = e.target.closest('[data-copy]');
+        if (copyBtn) copyText(copyBtn.getAttribute('data-copy'), copyBtn);
+      });
+    })();
+</script>
+</body>
+</html>

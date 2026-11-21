@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sheets</title>
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Dark Theme Base */
+    body {
+      background-color: #06090f;
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Technical Dot Matrix Grid with Radial Vignette */
+    .bg-dev-pattern {
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.10) 1px, transparent 1px),
+        linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px, 128px 128px, 128px 128px;
+    }
+
+    /* Smooth Lift & Glow on Hover */
+    .sheet-box {
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sheet-box:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-500 selection:text-white flex flex-col justify-start py-12 sm:py-16 px-4 sm:px-6 lg:px-8 relative bg-dev-pattern">
+
+  <!-- ========================================================================= -->
+  <!-- DEVELOPER GRAPHICS & AMBIENT GRAFFITI BACKGROUND (Non-intrusive, subtle) -->
+  <!-- ========================================================================= -->
+  <div class="fixed inset-0 pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
+    
+    <!-- Ambient Radial Glow Beacons -->
+    <div class="absolute -top-32 -left-20 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    <div class="absolute top-20 -right-24 w-[650px] h-[650px] bg-cyan-500/10 rounded-full blur-[130px]"></div>
+    <div class="absolute -bottom-40 left-1/3 w-[700px] h-[700px] bg-purple-600/8 rounded-full blur-[140px]"></div>
+
+    <!-- Decorative Developer SVG Watermarks & Circuits -->
+    <svg class="absolute inset-0 w-full h-full opacity-35" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Subtle Grid Blueprint Crosshair Pattern -->
+        <pattern id="crosshair-grid" width="128" height="128" patternUnits="userSpaceOnUse">
+          <path d="M64 60v8M60 64h8" stroke="rgba(255,255,255,0.08)" stroke-width="1.2" />
+        </pattern>
+        <linearGradient id="line-grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="line-grad-indigo" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#818cf8" stop-opacity="0.3" />
+          <stop offset="100%" stop-color="#818cf8" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+
+      <!-- Repeating Crosshair Markers -->
+      <rect width="100%" height="100%" fill="url(#crosshair-grid)" />
+
+      <!-- Left Circuit Wireframe / Graph Nodes -->
+      <g stroke="url(#line-grad-indigo)" stroke-width="1.2" fill="none">
+        <path d="M-20 180 h120 l40 40 v110 l-30 30 h-130" />
+        <circle cx="100" cy="180" r="3" fill="#818cf8" fill-opacity="0.4" />
+        <circle cx="140" cy="220" r="3" fill="#818cf8" fill-opacity="0.4" />
+        <circle cx="110" cy="360" r="3" fill="#818cf8" fill-opacity="0.4" />
+      </g>
+
+      <!-- Right Circuit Wireframe / Distributed Nodes -->
+      <g stroke="url(#line-grad-cyan)" stroke-width="1.2" fill="none">
+        <path d="M100% 280 h-140 l-50 50 v140 l40 40 h170" />
+        <circle cx="calc(100% - 140px)" cy="280" r="3" fill="#38bdf8" fill-opacity="0.4" />
+        <circle cx="calc(100% - 190px)" cy="330" r="3" fill="#38bdf8" fill-opacity="0.4" />
+        <circle cx="calc(100% - 150px)" cy="510" r="3" fill="#38bdf8" fill-opacity="0.4" />
+      </g>
+    </svg>
+
+    <!-- Faint Monospace Developer Code Graffiti (Left Margin) -->
+    <div class="absolute left-6 top-48 hidden xl:flex flex-col gap-2 font-mono text-[11px] text-slate-700/40 select-none leading-relaxed tracking-wider">
+      <span class="text-indigo-400/25">$ git status --short</span>
+      <span>M dsa.html</span>
+      <span>M libraries.html</span>
+      <span>M hld.html</span>
+      <span>M python_oops.html</span>
+      <span class="mt-4 text-slate-600/30"># Complexity Bounds</span>
+      <span>O(1) &lt; O(log n) &lt; O(n)</span>
+      <span>O(n log n) &lt; O(n²)</span>
+      <span class="mt-4 text-purple-400/20">class DistributedCluster {</span>
+      <span class="pl-3">async dispatch(task) { ... }</span>
+      <span>}</span>
+    </div>
+
+    <!-- Faint Monospace Developer Code Graffiti (Right Margin) -->
+    <div class="absolute right-6 top-36 hidden xl:flex flex-col items-end gap-2 font-mono text-[11px] text-slate-700/40 select-none leading-relaxed tracking-wider">
+      <span class="text-cyan-400/25">// PyTorch Tensor Graph</span>
+      <span>y = W·x + b &rarr; &sigma;(z)</span>
+      <span>loss.backward()</span>
+      <span>optimizer.step()</span>
+      <span class="mt-4 text-slate-600/30">// System Topology</span>
+      <span>Client &rarr; CDN &rarr; LB &rarr; Pods</span>
+      <span>Redis Cluster (P99 &lt; 2ms)</span>
+      <span class="mt-4 text-emerald-400/20">HTTP/2 200 OK</span>
+      <span>keep-alive: timeout=5</span>
+    </div>
+
+    <!-- Subtle Giant Watermark Braces in Background -->
+    <div class="absolute -left-12 bottom-12 font-mono text-[220px] font-extrabold text-indigo-500/[0.025] leading-none pointer-events-none">
+      {
+    </div>
+    <div class="absolute -right-12 bottom-12 font-mono text-[220px] font-extrabold text-cyan-500/[0.025] leading-none pointer-events-none">
+      }
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- FOREGROUND CONTENT CONTAINER                                              -->
+  <!-- ========================================================================= -->
+  <div class="w-full max-w-5xl mx-auto space-y-8 relative z-10">
+
+    <!-- Header: Minimal & Clean -->
+    <header class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 p-[1px] shadow-lg shadow-indigo-500/20">
+        <div class="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center text-indigo-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+        Sheets
+        <span class="text-xs font-mono font-normal text-slate-500 hidden sm:inline">~/workspace</span>
+      </h1>
+    </header>
+
+    <!-- Sheets Grid (Square Box Cards) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+
+      <!-- Sheet Box 1: DSA -->
+      <a
+        href="./dsa.html"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-indigo-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(99,102,241,0.28)] min-h-[220px]"
+      >
+        <div>
+          <!-- Icon & Corner Arrow -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400 group-hover:scale-105 group-hover:bg-indigo-600/25 transition-all">
+              <!-- Graph / Network Icon -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <circle cx="6" cy="6" r="2.4" />
+                <circle cx="18" cy="7" r="2.4" />
+                <circle cx="7" cy="18" r="2.4" />
+                <circle cx="18" cy="17" r="2.4" />
+                <path stroke-linecap="round" d="M8.3 6.8l7.2.4M6.5 8.5l.4 7M9.2 17.5l6.5-.4M16.2 9l-7.4 7.2" />
+              </svg>
+            </div>
+            
+            <span class="w-8 h-8 rounded-full bg-slate-800/50 border border-slate-700/40 flex items-center justify-center text-slate-500 group-hover:text-indigo-400 group-hover:border-indigo-500/40 transition-colors">
+              <svg class="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
+            DSA
+          </h2>
+
+          <!-- One-line Description -->
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Topic-wise problem tracker with patterns, insights, and progress tracking.
+          </p>
+        </div>
+      </a>
+
+      <!-- Sheet Box 2: Libraries -->
+      <a
+        href="./libraries.html"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-cyan-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(56,189,248,0.28)] min-h-[220px]"
+      >
+        <div>
+          <!-- Icon & Corner Arrow -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-600/15 border border-cyan-500/25 flex items-center justify-center text-cyan-400 group-hover:scale-105 group-hover:bg-cyan-600/25 transition-all">
+              <!-- Code / Terminal Icon -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+            
+            <span class="w-8 h-8 rounded-full bg-slate-800/50 border border-slate-700/40 flex items-center justify-center text-slate-500 group-hover:text-cyan-400 group-hover:border-cyan-500/40 transition-colors">
+              <svg class="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">
+            Libraries
+          </h2>
+
+          <!-- One-line Description -->
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Cheat sheet and quick syntax reference for NumPy, Pandas, Scikit-learn, PyTorch, and Matplotlib.
+          </p>
+        </div>
+      </a>
+
+      <!-- Sheet Box 3: HLD -->
+      <a
+        href="./hld.html"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-emerald-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(16,185,129,0.28)] min-h-[220px]"
+      >
+        <div>
+          <!-- Icon & Corner Arrow -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-600/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 group-hover:scale-105 group-hover:bg-emerald-600/25 transition-all">
+              <!-- System Architecture / Distributed Nodes Icon -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <rect x="4" y="4" width="6" height="6" rx="1.5"></rect>
+                <rect x="14" y="4" width="6" height="6" rx="1.5"></rect>
+                <rect x="9" y="14" width="6" height="6" rx="1.5"></rect>
+                <path stroke-linecap="round" d="M7 10v2a2 2 0 002 2h6a2 2 0 002-2v-2M12 14v-2" />
+              </svg>
+            </div>
+            
+            <span class="w-8 h-8 rounded-full bg-slate-800/50 border border-slate-700/40 flex items-center justify-center text-slate-500 group-hover:text-emerald-400 group-hover:border-emerald-500/40 transition-colors">
+              <svg class="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">
+            HLD
+          </h2>
+
+          <!-- One-line Description -->
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            System design guide covering networking, load balancing, caching, APIs, and distributed architectures.
+          </p>
+        </div>
+      </a>
+
+      <!-- Sheet Box 4: Python OOP -->
+      <a
+        href="./python_oops.html"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-amber-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(245,158,11,0.28)] min-h-[220px]"
+      >
+        <div>
+          <!-- Icon & Corner Arrow -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-400 group-hover:scale-105 group-hover:bg-amber-500/25 transition-all">
+              <!-- OOP 3D Isometric Cube / Object Icon -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            
+            <span class="w-8 h-8 rounded-full bg-slate-800/50 border border-slate-700/40 flex items-center justify-center text-slate-500 group-hover:text-amber-400 group-hover:border-amber-500/40 transition-colors">
+              <svg class="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
+            Python OOP
+          </h2>
+
+          <!-- One-line Description -->
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Complete OOP guide covering classes, dunder methods, encapsulation, inheritance, and patterns.
+          </p>
+        </div>
+      </a>
+
+      <!--
+        ========================================================================
+        HOW TO ADD A NEW SHEET LATER:
+        To add a 4th, 5th, or Nth sheet, simply duplicate one of the <a> tags
+        above and change:
+          1. href="./your-sheet.html"
+          2. Icon SVG & hover color (e.g. amber, rose, violet)
+          3. Title
+          4. One-line description
+        ========================================================================
+      -->
+
+    </div>
+
+  </div>
+
+</body>
+</html>

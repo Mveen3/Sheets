@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HLD — System Design Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a0e14;
+      --bg-surface: #111722;
+      --bg-surface-hover: #151d2b;
+      --bg-row-alt: rgba(255, 255, 255, 0.016);
+      --bg-row-hover: rgba(255, 255, 255, 0.042);
+      --bg-code: #0b0f17;
+      --border: #1e293b;
+      --border-strong: #2d3c54;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #8b9bb4;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background:
+        radial-gradient(1100px 420px at 85% -10%, rgba(56, 189, 248, 0.07), transparent 65%),
+        radial-gradient(900px 380px at 10% 0%, rgba(167, 139, 250, 0.05), transparent 65%),
+        var(--bg-base);
+      min-height: 100vh;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 9px; height: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: #26344b; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #364969; }
+
+    /* Ultra-Slim Single-Row Frozen Top Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 6px clamp(14px, 2.2vw, 36px);
+      background: rgba(10, 14, 20, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar::-webkit-scrollbar { display: none; }
+
+    .top-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .top-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11.8px;
+      font-weight: 500;
+      line-height: 1.25;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--border-strong);
+      color: #fff;
+      background: #172030;
+    }
+
+    .pill.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--pill-accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--pill-accent) 28%, transparent);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pill-accent);
+    }
+
+    /* Main Container */
+    .page {
+      width: 100%;
+      padding: 20px clamp(16px, 2.4vw, 40px) 76px;
+    }
+
+    /* Sections */
+    .hld-section {
+      width: 100%;
+      margin-bottom: 64px;
+      scroll-margin-top: 48px;
+    }
+    .hld-section:last-child { margin-bottom: 0; }
+    .hld-section.is-hidden { display: none; }
+
+    .sec-header {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 4px 10px;
+      border-radius: 7px;
+    }
+
+    .sec-header h2 {
+      font-size: 25px;
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      color: #fff;
+    }
+
+    .sec-tag {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--sec-accent);
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      padding: 4px 11px;
+      border-radius: 7px;
+    }
+
+    /* Topic Subgroups */
+    .subgroup {
+      margin-bottom: 36px;
+      width: 100%;
+    }
+    .subgroup:last-child { margin-bottom: 0; }
+    .subgroup.is-hidden { display: none; }
+
+    .subgroup-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .subgroup h3 {
+      font-size: 17.5px;
+      font-weight: 680;
+      color: #fff;
+      letter-spacing: -0.015em;
+    }
+
+    .sub-pill {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 2px 9px;
+      border-radius: 5px;
+    }
+
+    .added-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      padding: 2px 8px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    /* Readable Lead / Intro Explanation */
+    .lead {
+      font-size: 14.5px;
+      line-height: 1.72;
+      color: var(--text-secondary);
+      max-width: 96ch;
+      margin-bottom: 15px;
+    }
+    .lead strong { color: #fff; font-weight: 600; }
+    .lead code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / Analogy Strip */
+    .callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border-radius: var(--radius-md);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .callout-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--sec-accent);
+      background: rgba(10, 14, 20, 0.78);
+      padding: 3px 8px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .callout strong { color: #fff; font-weight: 600; }
+    .callout code {
+      font-family: var(--font-mono);
+      font-size: 12.8px;
+      color: #e2e8f0;
+      background: rgba(10, 14, 20, 0.6);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* Numbered Step Flow */
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      color: var(--sec-accent);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .step-title { font-size: 14px; font-weight: 650; color: #fff; line-height: 1.35; }
+    .step-desc { font-size: 13.4px; color: var(--text-secondary); line-height: 1.58; }
+    .step-desc strong { color: #fff; font-weight: 600; }
+    .step-desc code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Explanatory Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .concept-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 17px 19px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.15s ease;
+    }
+    .concept-card:hover { border-color: var(--border-strong); }
+    .concept-card.accent-left { border-left: 3px solid var(--sec-accent); }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 680;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 11.2px;
+      font-weight: 600;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 2px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .card-p {
+      font-size: 13.9px;
+      line-height: 1.66;
+      color: var(--text-secondary);
+    }
+    .card-p strong { color: #fff; font-weight: 600; }
+    .card-p code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13.9px;
+      line-height: 1.62;
+      color: var(--text-secondary);
+    }
+    .card-list li {
+      position: relative;
+      padding-left: 15px;
+    }
+    .card-list li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--sec-accent);
+      font-weight: 700;
+    }
+    .card-list strong { color: #fff; font-weight: 600; }
+    .card-list code {
+      font-family: var(--font-mono);
+      font-size: 12.4px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .card-foot {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(30, 41, 59, 0.85);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+    .card-foot strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* Tables (matching libraries.html clean edge-to-edge style) */
+    .table-card {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      margin-bottom: 16px;
+    }
+    .table-card:last-child { margin-bottom: 0; }
+
+    .ops-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      table-layout: auto;
+    }
+
+    .ops-table thead th {
+      font-size: 11.4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.025);
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .op-row {
+      border-bottom: 1px solid rgba(30, 41, 59, 0.75);
+      transition: background 0.12s ease;
+    }
+    .op-row:nth-child(even) { background: var(--bg-row-alt); }
+    .op-row:last-child { border-bottom: none; }
+    .op-row:hover { background: var(--bg-row-hover); }
+    .op-row.is-hidden { display: none; }
+
+    .ops-table td {
+      padding: 13px 16px;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.62;
+      color: var(--text-secondary);
+    }
+    .ops-table td strong { color: #fff; font-weight: 600; }
+    .ops-table td code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .col-key {
+      width: 19%;
+      white-space: nowrap;
+    }
+
+    .fn-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12.8px;
+      font-weight: 600;
+      color: var(--sec-accent);
+      background: var(--sec-soft);
+      border: 1px solid var(--sec-border);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .mono-chip {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12.2px;
+      color: #e2e8f0;
+      background: var(--bg-code);
+      border: 1px solid rgba(45, 60, 84, 0.8);
+      padding: 2px 7px;
+      border-radius: 5px;
+      margin: 2px 4px 2px 0;
+    }
+
+    .good-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.24);
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      color: #a7f3d0;
+      margin-bottom: 4px;
+    }
+
+    .warn-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: rgba(244, 63, 94, 0.09);
+      border: 1px solid rgba(244, 63, 94, 0.26);
+      font-family: var(--font-mono);
+      font-size: 11.8px;
+      color: #fda4af;
+      margin-bottom: 4px;
+    }
+
+    /* Visual Architecture Strip */
+    .arch-box {
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--sec-accent);
+      border-radius: var(--radius-md);
+      padding: 15px 18px;
+      font-family: var(--font-mono);
+      font-size: 13.2px;
+      line-height: 1.75;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    .arch-box .dim { color: var(--text-muted); }
+    .arch-box .hi { color: var(--sec-accent); font-weight: 600; }
+    .arch-box .ok { color: #86efac; }
+
+    @media (max-width: 1080px) {
+      .card-grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding: 6px 12px; gap: 8px; }
+      .page { padding: 16px 12px 56px; }
+      .card-grid.cols-2, .card-grid.cols-3 { grid-template-columns: 1fr; }
+      .col-key { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="index.html" class="pill" style="padding: 4px 10px; font-size: 11px; text-decoration: none; border-color: rgba(255,255,255,0.14);" title="Back to Index Hub">
+      ← Hub
+    </a>
+    <h1 class="top-title">HLD</h1>
+    <span class="top-divider" aria-hidden="true"></span>
+    <nav class="filter-pills" id="filterPills" aria-label="Filter sections">
+      <button class="pill active" data-filter="all" style="--pill-accent:#e2e8f0">All</button>
+      <button class="pill" data-filter="networking" style="--pill-accent:#38bdf8"><span class="pill-dot"></span>Networking</button>
+      <button class="pill" data-filter="apis" style="--pill-accent:#a78bfa"><span class="pill-dot"></span>APIs</button>
+      <button class="pill" data-filter="caching" style="--pill-accent:#34d399"><span class="pill-dot"></span>Caching</button>
+      <button class="pill" data-filter="databases" style="--pill-accent:#fb923c"><span class="pill-dot"></span>Databases</button>
+      <button class="pill" data-filter="scaling" style="--pill-accent:#f43f5e"><span class="pill-dot"></span>Scaling</button>
+      <button class="pill" data-filter="security" style="--pill-accent:#fbbf24"><span class="pill-dot"></span>Security</button>
+      <button class="pill" data-filter="design" style="--pill-accent:#2dd4bf"><span class="pill-dot"></span>Design</button>
+      <button class="pill" data-filter="cases" style="--pill-accent:#818cf8"><span class="pill-dot"></span>Case Studies</button>
+    </nav>
+  </header>
+
+  <main class="page" id="pageMain">
+
+    <!-- ==================== 01 NETWORKING & EDGE ==================== -->
+    <section class="hld-section" id="networking" data-sec="networking" style="--sec-accent:#38bdf8;--sec-soft:rgba(56, 189, 248, 0.11);--sec-border:rgba(56, 189, 248, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">01</span>
+        <h2>Networking &amp; Edge Delivery</h2>
+        <span class="sec-tag">DNS · Load Balancer · CDN · Proxies</span>
+      </header>
+
+      <div class="callout">
+        <span class="callout-tag">The Big Picture</span>
+        <div><strong>System Design (HLD)</strong> is the art of planning how large applications survive massive real-time traffic without crashing or slowing down — like crores of people watching the last over of a cricket final on Hotstar at the exact same second. It brings together <strong>Networking, APIs, Caching, Databases, Scaling, and Security</strong> into one working blueprint.</div>
+      </div>
+
+      <!-- DNS & App Open Flow -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>What Actually Happens When You Tap an App? (DNS Resolution)</h3>
+          <span class="sub-pill">IPv4 = 32-bit · IPv6 = 128-bit</span>
+        </div>
+        <p class="lead">
+          Computers talk to each other using numeric <strong>IP addresses</strong> (like <code>142.250.193.78</code>), not domain names. Since humans can't memorize strings of numbers for every website, <strong>DNS (Domain Name System)</strong> acts like the internet's phonebook — translating friendly names like <code>api.hotstar.com</code> into the exact server IP behind the scenes.
+        </p>
+        <div class="flow-steps">
+          <div class="step-card">
+            <span class="step-num">1</span>
+            <div class="step-meta">
+              <span class="step-title">App Loads into RAM</span>
+              <span class="step-desc">Your phone's OS loads the app into RAM (running code always lives in RAM) and checks for internet. If offline, it shows locally cached content or an error. If online, it prepares an API call like <code>GET api.hotstar.com/homefeed</code>.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">2</span>
+            <div class="step-meta">
+              <span class="step-title">Check Local Caches First</span>
+              <span class="step-desc">Before searching the whole internet, the system checks fast caches in order: <strong>Browser Cache → OS Cache → ISP Resolver → Public DNS</strong> (Google <code>8.8.8.8</code>, Cloudflare). Most everyday lookups end right here.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">3</span>
+            <div class="step-meta">
+              <span class="step-title">Recursive DNS Lookup</span>
+              <span class="step-desc">If the IP isn't cached anywhere, a <strong>recursive resolver</strong> hunts it down step-by-step: asks the nearest <strong>Root Server</strong> (13 global clusters) → points to the <strong>TLD Server</strong> (<code>.com</code>) → points to the <strong>Authoritative Nameserver</strong>, which returns the true IP.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">4</span>
+            <div class="step-meta">
+              <span class="step-title">Enter via Load Balancer</span>
+              <span class="step-desc">Once your device has the IP, the request still doesn't go straight to an application server. It first hits a <strong>Load Balancer</strong> (or CDN edge), which safely routes it to a healthy backend machine.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load Balancers -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Load Balancers — Keeping Servers Alive Under Traffic</h3>
+          <span class="sub-pill">Propagation Delay = Distance ÷ Signal Speed</span>
+          <span class="added-pill">+ Algorithms Added</span>
+        </div>
+        <p class="lead">
+          If millions of users hit a single server, its CPU and RAM max out and the app crashes. A <strong>Load Balancer</strong> sits at the front door like a traffic police officer, spreading incoming requests across a fleet of backend servers. If one server dies, it automatically stops sending traffic there so users never notice an outage. It can even cache hot items (like a viral trailer) and reply directly without bothering the backend.
+        </p>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Type / Layer</th><th>How It Works</th><th>Pros &amp; Trade-offs</th><th>Real-World Examples</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Hardware vs Software vs Cloud</span></td>
+                <td><strong>Hardware</strong> is a dedicated physical box built purely for routing. <strong>Software</strong> runs as a program on normal Linux servers/K8s. <strong>Cloud-managed</strong> is offered ready-made by AWS/GCP/Azure.</td>
+                <td>Hardware is ultra-fast but very expensive (used by giants like Google). Software is cheaper and flexible. Cloud-managed is today's default because the cloud provider handles scaling and maintenance.</td>
+                <td><span class="mono-chip">F5 BIG-IP</span> <span class="mono-chip">NGINX</span> <span class="mono-chip">HAProxy</span> <span class="mono-chip">Envoy</span> <span class="mono-chip">AWS ALB/NLB</span></td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Layer 4 (Transport)</span></td>
+                <td>Looks only at the network packet's <strong>IP address and Port</strong> (TCP/UDP). It forwards packets blindly without opening or reading the HTTP request inside.</td>
+                <td><span class="good-tag">Super fast &amp; cheap</span> Minimal CPU work since it doesn't inspect content, but it's "dumb" — it cannot route differently based on URL paths or cookies.</td>
+                <td>Raw TCP streams, video streaming, gaming servers, database proxies.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Layer 7 (Application)</span></td>
+                <td>Opens the HTTP request and reads the <strong>URL path, headers, and cookies</strong>. Can send <code>/reels</code> to video servers, <code>/chat</code> to messaging servers, and <code>/upload</code> to storage servers.</td>
+                <td><span class="good-tag">Smart &amp; flexible</span> Enables microservice routing, SSL termination, and caching, though inspecting every request costs more CPU and money than L4.</td>
+                <td>Modern web apps &amp; microservices (Instagram, Amazon, Uber).</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Global LB &amp; Anycast</span></td>
+                <td>Global companies run data centers worldwide (India, US, Europe). A <strong>Global LB</strong> sends you to the nearest regional LB. With <strong>Anycast</strong>, multiple data centers share the <em>exact same IP</em>, and internet routing automatically sends you to the closest one.</td>
+                <td>Cuts physical travel distance dramatically (remember: latency grows with distance) and automatically reroutes traffic if an entire region goes down.</td>
+                <td>Google Search, YouTube, Cloudflare global network.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Routing Algorithms</span></td>
+                <td><strong>Round Robin</strong> takes turns (S1 → S2 → S3). <strong>Weighted RR</strong> sends more work to stronger machines. <strong>Least Connections</strong> picks whichever server currently has the fewest active users. <strong>IP Hash</strong> always maps the same user to the same server.</td>
+                <td>Round Robin is simplest; Least Connections shines when some requests take much longer than others; IP Hash helps when a server holds local session state.</td>
+                <td><span class="added-pill">+ Interview Essential</span> Choose based on request length &amp; server hardware.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CDN -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Content Delivery Network (CDN)</h3>
+          <span class="sub-pill">Serving Data From Down the Street</span>
+        </div>
+        <div class="callout">
+          <span class="callout-tag">Simple Analogy</span>
+          <div>Think of <strong>Blinkit / Instamart vs. traditional Amazon</strong>. Amazon keeps stock in big central warehouses (1–3 days delivery). Blinkit places small dark stores in every neighborhood so items arrive in 10 minutes. A <strong>CDN</strong> does the exact same thing for videos, photos, and web files — keeping copies on local <strong>Edge Servers</strong> close to users instead of fetching from a faraway <strong>Origin Server</strong> in another continent.</div>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">How a CDN Request Flows</span><span class="card-badge">Cache Hit vs Miss</span></div>
+            <p class="card-p">When you open a video or website, DNS doesn't give you the origin server's IP — it resolves directly to the <strong>nearest CDN edge server</strong>.</p>
+            <ul class="card-list">
+              <li><strong>Cache Hit (~20 ms):</strong> The edge server already has a copy of the file and sends it back almost instantly.</li>
+              <li><strong>Cache Miss (~2500 ms):</strong> The file isn't at the edge yet, so the edge fetches it from the distant origin server, hands it to you, and saves a copy locally so the next nearby user gets a fast hit.</li>
+              <li><strong>Built-in Reliability:</strong> If your nearest edge server crashes, requests smoothly fall over to the next-nearest healthy edge server.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Why Even an 80% Hit Rate Is Huge</span><span class="card-badge">Pull vs Push CDN</span></div>
+            <p class="card-p">Suppose an origin fetch takes <strong>2500 ms</strong> and an edge fetch takes <strong>20 ms</strong>. Over 100 requests:</p>
+            <ul class="card-list">
+              <li><strong>Without CDN:</strong> All 100 hit origin → <code>250,000 ms</code> total (<strong>2,500 ms</strong> average per request).</li>
+              <li><strong>With 80% Hit Rate:</strong> 80 hits (<code>1,600 ms</code>) + 20 misses (<code>50,000 ms</code>) = <code>51,600 ms</code> total → <strong>516 ms</strong> average (~5× faster!).</li>
+              <li><strong>Pull vs. Push:</strong> Most CDNs are <em>Pull</em> (fetch automatically on first miss and expire via TTL). <em>Push</em> CDNs let you pre-upload files ahead of a big launch so even the very first user gets a hit.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forward vs Reverse Proxy -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Forward Proxy vs. Reverse Proxy</h3>
+          <span class="sub-pill">Client's Bodyguard vs. Server's Bodyguard</span>
+        </div>
+        <p class="lead">
+          A <strong>proxy</strong> is simply a middleman that stands between a sender and a receiver. The only thing that separates a forward proxy from a reverse proxy is <em>whose side it sits on and who it protects</em>.
+        </p>
+        <div class="card-grid cols-2">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Forward Proxy (Client-Side)</span><span class="card-badge">Squid · VPNs</span></div>
+            <p class="card-p">Sits between <strong>you (the client) and the internet</strong>. Websites only see the proxy's IP address, never your real IP.</p>
+            <ul class="card-list">
+              <li><strong>Content Filtering:</strong> Colleges and offices route student/employee traffic through a forward proxy to block sites like Facebook before requests even leave the network.</li>
+              <li><strong>Privacy &amp; Bypass:</strong> Masks your IP or geographic region. Using a VPN to bypass a college block is simply using <em>your own</em> forward proxy instead of theirs.</li>
+              <li><strong>Local Caching:</strong> Caches popular pages inside an institution so 500 students don't re-download the same file from the internet.</li>
+            </ul>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Reverse Proxy (Server-Side)</span><span class="card-badge">NGINX · HAProxy</span></div>
+            <p class="card-p">Sits between <strong>the internet and a company's backend servers</strong>. Users don't even know it's there — it hides internal server IPs and shields the backend.</p>
+            <ul class="card-list">
+              <li><strong>Load Balancing &amp; Caching:</strong> Spreads incoming requests across backend machines and replies directly for cached pages.</li>
+              <li><strong>SSL/TLS Termination:</strong> Handles heavy HTTPS decryption at the front door so internal traffic between the proxy and backend servers can travel fast over plain HTTP inside a private network.</li>
+              <li><strong>Security &amp; Compression:</strong> Blocks DDoS floods and SQL injection attempts, and compresses responses (Gzip/Brotli) to save bandwidth.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 02 APIS & COMMUNICATION ==================== -->
+    <section class="hld-section" id="apis" data-sec="apis" style="--sec-accent:#a78bfa;--sec-soft:rgba(167, 139, 250, 0.11);--sec-border:rgba(167, 139, 250, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">02</span>
+        <h2>APIs, Gateways &amp; Communication Protocols</h2>
+        <span class="sec-tag">API Gateway · SDK · REST · GraphQL · gRPC · WebSockets · Webhooks</span>
+      </header>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>API, API Gateway &amp; SDK — How They Differ</h3>
+        </div>
+        <p class="lead">
+          The internet physically connects your phone (<strong>frontend</strong>) to a company's servers (<strong>backend</strong>), but an <strong>API</strong> defines the exact rules for how they talk — what requests are allowed and what responses look like. In big apps like Netflix or Swiggy, dozens of separate backend services run in parallel (Auth, Search, Payments, Recommendations), so an <strong>API Gateway</strong> stands in front as a single reception desk.
+        </p>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">API Gateway — The Front Desk</span><span class="card-badge">Kong · AWS API GW</span></div>
+            <p class="card-p">Instead of making your mobile app know the addresses of 20 internal microservices, every request enters through one API Gateway.</p>
+            <ul class="card-list">
+              <li><strong>Smart Routing:</strong> Sends <code>/login</code> to Auth Service and <code>/pay</code> to Payment Service.</li>
+              <li><strong>Upfront Security:</strong> Checks JWT/OAuth tokens and enforces rate limits before a single bad request touches your backend.</li>
+              <li><strong>Quick Shortcuts (Caching):</strong> If a response is already cached, the gateway returns it right away — like a Zomato delivery partner picking up a packed order at the counter without sitting down to order.</li>
+            </ul>
+            <div class="card-foot"><strong>Design rule:</strong> Always keep the API Gateway <strong>stateless</strong> (no local session storage) so you can scale it horizontally under spikes.</div>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">API vs. SDK — Waiter vs. Full Kitchen</span><span class="card-badge">Build Faster</span></div>
+            <p class="card-p">When building a house, you don't manufacture your own cement or electrical wires — you buy ready-made materials. Software works the same way.</p>
+            <ul class="card-list">
+              <li><strong>API = The Waiter:</strong> Just the communication channel carrying a request to a server and bringing back a response.</li>
+              <li><strong>SDK = The Fully Equipped Kitchen:</strong> A complete developer toolkit (libraries, helper functions, sample code, docs) for plugging in a whole feature — like Razorpay payments, Google Maps, or Gemini AI — in minutes.</li>
+              <li><strong>Under the hood:</strong> An SDK still calls the provider's APIs internally; it just spares you from writing the raw HTTP plumbing yourself.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Choosing the Right API Style</h3>
+          <span class="sub-pill">Different jobs need different communication styles</span>
+        </div>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>API Style</th><th>How It Works (Simple Version)</th><th>Where It Shines</th><th>Trade-offs &amp; Notes</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">REST</span></td>
+                <td>Treats everything as a URL resource and uses standard HTTP verbs: <code>GET</code> (read), <code>POST</code> (create), <code>PUT</code> (replace), <code>PATCH</code> (edit), <code>DELETE</code> (remove), usually sending JSON.</td>
+                <td><span class="good-tag">Everyday default</span> Almost all public web and mobile APIs — simple, stateless, and easy to cache.</td>
+                <td>Sometimes sends too much extra data (over-fetching) or forces a screen to make 4–5 separate API calls.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">GraphQL</span></td>
+                <td>Created by Meta. Uses a single endpoint where the client asks for the <em>exact</em> fields it wants — e.g., user name + last 3 orders + reward points — and gets everything back in one neat JSON reply.</td>
+                <td>Data-heavy mobile screens (like a Swiggy/Zomato home screen) where saving round trips and mobile bandwidth matters.</td>
+                <td>Adds backend query complexity and makes standard HTTP URL caching harder than REST.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">gRPC</span></td>
+                <td>Created by Google. Lets Service A call a function on Service B as if it were local code, sending compact <strong>binary</strong> messages (Protocol Buffers) over HTTP/2 instead of text JSON.</td>
+                <td><span class="good-tag">Blazing fast</span> High-frequency internal chatter between microservices (e.g., Order → Payment → Kitchen).</td>
+                <td>Binary payloads aren't human-readable for quick debugging, and browsers don't support it natively without a proxy.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">WebSockets</span></td>
+                <td>Starts as a normal HTTP request, then upgrades (<code>HTTP 101 Switching Protocols</code>) into an open, two-way tunnel where both client and server can push messages anytime.</td>
+                <td>Real-time features: WhatsApp chat, live Swiggy delivery map, live cricket scores, Instagram Live comments.</td>
+                <td>Avoids wasteful repeated polling, but holding millions of open connections requires careful stateful scaling.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Webhooks</span></td>
+                <td>Event-based callback ("don't call us, we'll call you"). You give Stripe/PayPal a URL; the instant a payment succeeds, they automatically send an HTTP <code>POST</code> to your server.</td>
+                <td>Payment confirmations, GitHub CI/CD triggers, shipping updates — zero wasted polling.</td>
+                <td>Because anyone could try faking a callback, always verify the <strong>HMAC signature</strong> and check the <strong>timestamp</strong> to block replay attacks.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">SOAP</span></td>
+                <td>An older, strict <strong>XML-based</strong> protocol where every message follows a rigid envelope/body structure with built-in enterprise security (<strong>WS-Security</strong>).</td>
+                <td>Legacy banking, insurance, and government integrations where formal compliance outweighs speed.</td>
+                <td>Heavy, verbose XML payloads — rarely chosen for greenfield consumer apps today.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 03 CACHING ==================== -->
+    <section class="hld-section" id="caching" data-sec="caching" style="--sec-accent:#34d399;--sec-soft:rgba(52, 211, 153, 0.11);--sec-border:rgba(52, 211, 153, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">03</span>
+        <h2>Caching &amp; Memory Performance</h2>
+        <span class="sec-tag">RAM vs Disk · 7 Layers · Write Policies · Pitfalls</span>
+      </header>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Why Databases Need a Caching Layer</h3>
+          <span class="sub-pill">Fighter Jet (Registers) → Sports Car (Cache) → Car (RAM) → Bike (SSD) → Bicycle (HDD)</span>
+        </div>
+        <p class="lead">
+          Databases store data safely on disk (SSD/HDD), which takes <strong>milliseconds</strong> to read. That sounds quick until millions of users hit the database at once. A <strong>cache</strong> (like <strong>Redis</strong> or <strong>Memcached</strong>) stores hot, frequently accessed data in <strong>RAM</strong>, which responds in nanoseconds to microseconds — roughly thousands to a million times faster than disk. Because RAM is expensive and <strong>volatile</strong> (wiped on restart), we keep only high-value hot data there (user feeds, sessions, trending deals) while the database remains the permanent source of truth.
+        </p>
+
+        <div class="callout">
+          <span class="callout-tag">Key Clarification</span>
+          <div><strong>Caching does not just mean Redis!</strong> It is a universal idea applied at 7 points along a request's journey: <strong>(1) DNS Cache</strong> at your browser/ISP, <strong>(2) Client/Device Cache</strong> for logos &amp; recent chats, <strong>(3) Forward Proxy Cache</strong> in colleges/offices, <strong>(4) CDN Edge Cache</strong> for videos &amp; thumbnails, <strong>(5) Reverse Proxy Cache</strong> for API/HTML responses, <strong>(6) Application Cache (Redis)</strong> for dynamic feeds/sessions, and <strong>(7) Database Query Cache</strong> for heavy repeated queries.</div>
+        </div>
+      </div>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>How Reads &amp; Writes Stay in Sync</h3>
+          <span class="added-pill">+ Cache-Aside &amp; Write-Around Added</span>
+        </div>
+        <p class="lead">
+          Reading from a cache is simple: if the item is there (<strong>Cache Hit</strong>), return it immediately without touching the database; if not (<strong>Cache Miss</strong>), fetch from the database and store a copy in the cache. The tricky part is <strong>writes</strong> — when a value changes from <code>x = 100</code> to <code>x = 200</code>, when does the underlying database get updated?
+        </p>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Strategy</th><th>How It Works</th><th>Best Advantage</th><th>Main Trade-off / Risk</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Cache-Aside</span></td>
+                <td>Your app code checks the cache first. On a miss, your app reads from the DB, saves the result into the cache with an expiry (TTL), and returns it.</td>
+                <td><span class="good-tag">Most popular</span> Only actually requested data takes up RAM, and if Redis goes down, your app still works (just slower via DB).</td>
+                <td>The very first read is always a slow miss, and cached data can be slightly stale until its TTL expires.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Write-Through</span></td>
+                <td>Every time data is updated, it is written to the <strong>cache and the database/main memory at the exact same time</strong> before confirming success.</td>
+                <td><span class="good-tag">Always consistent</span> Both copies match at every moment, so no data is lost if the cache crashes.</td>
+                <td>Slower writes because every update has to wait for two separate writes to finish.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Write-Back</span></td>
+                <td>Updates hit <strong>only the cache</strong> right away and mark the block with a <strong>Dirty Bit = 1</strong> ("modified, needs saving"). A background worker flushes dirty blocks to memory/DB later in batches.</td>
+                <td><span class="good-tag">Super fast writes</span> Absorbs huge write bursts cleanly (this is why YouTube/Instagram like counts update on your screen immediately while the admin panel catches up seconds later).</td>
+                <td><span class="warn-tag">Data loss risk</span> Brief inconsistency between cache and DB — and if the cache crashes before flushing dirty blocks, those pending edits vanish.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Write-Around</span></td>
+                <td>Writes go straight to the database, skipping the cache completely. Data enters the cache only later if someone reads it.</td>
+                <td>Keeps rarely-read write-once items (like logs or old messages) from kicking out genuinely hot data from RAM.</td>
+                <td>If a user writes something and immediately reads it back, they hit a cache miss.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Eviction &amp; Real-World Cache Pitfalls</h3>
+          <span class="added-pill">+ Interview Must-Knows</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">When RAM Fills Up (Eviction)</span><span class="card-badge">Making Room</span></div>
+            <ul class="card-list">
+              <li><strong>LRU (Least Recently Used):</strong> Kicks out whichever item hasn't been touched for the longest time. Great all-around default.</li>
+              <li><strong>LFU (Least Frequently Used):</strong> Kicks out items with the fewest total hits — handy when a sudden one-time scan shouldn't push out evergreen popular items.</li>
+              <li><strong>TTL (Time To Live):</strong> Automatically deletes a key after a set time (say, 5 minutes) so stale data doesn't linger forever.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">3 Ways Caching Can Crash Your DB</span><span class="card-badge">And How to Fix Them</span></div>
+            <ul class="card-list">
+              <li><strong>Cache Stampede (Thundering Herd):</strong> One super-hot key expires and 10,000 users hit the DB at the exact same instant. <em>Fix:</em> Let only one request rebuild the cache (lock) while others wait, or refresh proactively before expiry.</li>
+              <li><strong>Cache Penetration:</strong> Bots request fake IDs (<code>user_-999</code>) that exist nowhere, bypassing cache straight to DB. <em>Fix:</em> Cache "not found" briefly or put a <strong>Bloom Filter</strong> in front.</li>
+              <li><strong>Cache Avalanche:</strong> Thousands of keys share the same TTL and expire together. <em>Fix:</em> Add random jitter (e.g., 5 min ± 30 sec) to every TTL.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 04 DATABASES & STORAGE ==================== -->
+    <section class="hld-section" id="databases" data-sec="databases" style="--sec-accent:#fb923c;--sec-soft:rgba(251, 146, 60, 0.11);--sec-border:rgba(251, 146, 60, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">04</span>
+        <h2>Databases, Storage &amp; Distributed Data</h2>
+        <span class="sec-tag">SQL vs NoSQL · Partitioning · Sharding · Replication · CAP · ACID/BASE</span>
+      </header>
+
+      <!-- SQL vs NoSQL -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>SQL vs. NoSQL — How to Pick the Right Database</h3>
+          <span class="sub-pill">Never give a flat "SQL is better" or "NoSQL is better" answer</span>
+        </div>
+        <p class="lead">
+          In interviews and real engineering, you pick a database by asking six practical questions: <strong>Is the data structured or variable?</strong> Is traffic <strong>read-heavy or write-heavy?</strong> Does a wrong number lose money (<strong>strict consistency</strong>) or is a 2-second delay fine? Do we need <strong>complex multi-table joins</strong>? And how big are the <strong>traffic spikes</strong> (like Big Billion Days)? Real apps like Amazon almost always combine several databases together — <strong>PostgreSQL</strong> for orders/payments, <strong>MongoDB</strong> for flexible product catalogs, <strong>Redis</strong> for hot homepage deals, and <strong>S3 + CDN</strong> for product images.
+        </p>
+
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Database Type</th><th>How Data Is Stored &amp; Why It Exists</th><th>Best Use Cases</th><th>Limitations &amp; Examples</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Relational (SQL)</span></td>
+                <td>Strict tables of rows and columns connected by keys. Guarantees rock-solid <strong>ACID</strong> rules and handles complex multi-filter queries (e.g., "buyers in Delhi who bought a ₹50k–₹1L laptop in the last 6 months").</td>
+                <td>Banking, payments, e-commerce orders, railway/flight seat bookings — anywhere accuracy is non-negotiable.</td>
+                <td>Harder to scale writes horizontally; rigid schema resists wildly varying attributes.<br><span class="mono-chip">PostgreSQL</span> <span class="mono-chip">MySQL</span> <span class="mono-chip">Oracle</span></td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Document</span></td>
+                <td>Stores each item as a self-contained <strong>JSON / BSON</strong> document. A TV document can have <code>resolution</code> while a shoe has <code>size</code> — no wasted <code>NULL</code> columns! Docs have size caps (MongoDB: <strong>16 MB</strong>), so heavy images/videos go in S3/CDN and the document stores only the URL.</td>
+                <td>E-commerce product catalogs (including parent-child product variants like iPhone 128/256/512GB), CMS, user profiles.</td>
+                <td>Not built for complex multi-table joins or heavy relational analytics.<br><span class="mono-chip">MongoDB</span> <span class="mono-chip">CouchDB</span></td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Key-Value</span></td>
+                <td>Works like a giant Python dictionary. Uses hashing (<code>key % N</code>) to jump straight to the exact storage bucket in <strong>O(1)</strong> time without scanning rows.</td>
+                <td>Caching, shopping carts (<code>user_id → items</code>), login sessions, per-user Netflix recommendations.</td>
+                <td>Cannot run aggregates like "average salary of all employees" or SQL joins — you must know the key.<br><span class="mono-chip">Redis</span> <span class="mono-chip">DynamoDB</span></td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Column-Family</span></td>
+                <td>Instead of storing each row together, it stores <strong>all values of one column together</strong>. Want the average salary across 100M employees? It scans <em>only</em> the salary column and ignores names, addresses, and departments.</td>
+                <td><strong>OLAP</strong> (massive analytics &amp; aggregations), IoT sensor streams, event logging, high-speed distributed writes.</td>
+                <td>Poor for <strong>OLTP</strong> (single-row inserts/updates must touch multiple column stores; joins are painful).<br><span class="mono-chip">Cassandra</span> <span class="mono-chip">HBase</span> <span class="mono-chip">BigTable</span></td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Graph</span></td>
+                <td>Stores entities as <strong>Nodes</strong> (Rahul, TCS, Jaipur) and connections as <strong>Edges</strong> (<code>FRIEND_OF</code>, <code>WORKS_AT</code>). Finding "Rahul's friends in Jaipur who work at TCS" just walks edges instead of joining 5 giant SQL tables across 3 billion users.</td>
+                <td>Social networks (mutual friends, LinkedIn), Netflix recs, Google Knowledge Graph, bank fraud ring detection.</td>
+                <td>Overkill for simple tabular records or bulk financial reporting.<br><span class="mono-chip">Neo4j</span> <span class="mono-chip">Amazon Neptune</span> <span class="mono-chip">TigerGraph</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Partitioning vs Sharding vs Replication -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Partitioning vs. Sharding vs. Replication</h3>
+          <span class="sub-pill">Three distinct tools people constantly mix up</span>
+        </div>
+        <p class="lead">
+          When a table grows to a billion rows, scanning all of it on every query grinds your app to a halt. Here is the clean mental split: <strong>Partitioning</strong> organizes data inside <em>one</em> server, <strong>Sharding</strong> splits data across <em>multiple</em> servers (great for writes), and <strong>Replication</strong> makes full copies across servers (great for reads and backups).
+        </p>
+        <div class="card-grid cols-3">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">1. Partitioning</span><span class="card-badge">Same DB Server</span></div>
+            <p class="card-p">Splits a huge table into smaller chunks <strong>on the same machine</strong> — like adding separate Veg, Non-Veg, and Dessert counters inside one restaurant.</p>
+            <ul class="card-list">
+              <li><strong>Horizontal:</strong> Split by rows (e.g., 10k rows per chunk).</li>
+              <li><strong>Vertical:</strong> Split by columns (keep frequently read "hot" columns separate from rarely used "cold" columns).</li>
+              <li><strong>How rows get routed:</strong> <em>Range</em> (orders by year), <em>List</em> (by country: India/US/Japan), or <em>Hash</em> (<code>user_id % 4</code> for even spread).</li>
+            </ul>
+            <div class="card-foot"><strong>Limit:</strong> Low network overhead and easy to manage, but still capped by one server's hardware (like vertical scaling).</div>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">2. Sharding</span><span class="card-badge">Multiple DB Servers</span></div>
+            <p class="card-p">Splits your data across <strong>separate independent servers</strong> (shards) — like opening completely new restaurant branches in Delhi, Tokyo, and New York.</p>
+            <ul class="card-list">
+              <li><strong>Shines for Write-Heavy Apps:</strong> In WhatsApp or Instagram, a new post from North India writes <em>only</em> to the North shard — no need to coordinate with other shards.</li>
+              <li><strong>Near-limitless scale:</strong> Just add more shards as data grows (horizontal scaling).</li>
+              <li><strong>The Pain Points:</strong> Queries needing data from multiple shards (cross-shard joins) are slow and complex, and popular keys can overload one shard.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">3. Replication</span><span class="card-badge">Full Copies</span></div>
+            <p class="card-p">Creates complete copies of your database on other servers using a <strong>Leader (Master) → Follower (Replica)</strong> setup.</p>
+            <ul class="card-list">
+              <li><strong>Shines for Read-Heavy Apps:</strong> When Netflix drops a hit movie, millions of reads spread across replicas so the primary DB stays calm.</li>
+              <li><strong>High Availability:</strong> If the Leader crashes, a Follower gets promoted so the app stays online.</li>
+              <li><strong>Sync vs Async:</strong> <em>Synchronous</em> updates every replica immediately (strictly consistent, slower writes). <em>Asynchronous</em> updates replicas moments later (fast writes, slight lag).</li>
+            </ul>
+            <div class="card-foot"><strong>In production:</strong> Big companies use <strong>both</strong> — shard the data, then replicate each shard!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consistent Hashing & Indexing (Added) -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Consistent Hashing &amp; Database Indexing</h3>
+          <span class="added-pill">+ Core HLD Additions</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Why Simple <code>key % N</code> Breaks — Consistent Hashing</span><span class="card-badge">Smart Sharding</span></div>
+            <p class="card-p">Suppose you shard keys across 4 servers using <code>user_id % 4</code>. The day you add a 5th server (<code>% 5</code>), almost <strong>every single key maps to a different server</strong> — triggering massive data migration and wiping out your cache hit rate!</p>
+            <p class="card-p"><strong>Consistent Hashing</strong> fixes this by arranging servers and keys on a circular <strong>Hash Ring</strong> (<code>0</code> to <code>2³²-1</code>). Every key belongs to the first server found moving clockwise. Now, adding or removing a server only moves keys from its immediate neighbor (~<code>1/N</code> of data). Adding <strong>Virtual Nodes</strong> (placing each server at several spots on the ring) keeps the load evenly balanced.</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Database Indexing: B-Tree vs. LSM-Tree</span><span class="card-badge">Fast Lookups</span></div>
+            <p class="card-p">An <strong>index</strong> is like a book's index page: instead of scanning 1 billion rows one by one (<code>O(N)</code>), the DB jumps straight to the record in <code>O(log N)</code>. The trade-off: every write gets slightly slower because the index must also be updated.</p>
+            <ul class="card-list">
+              <li><strong>B-Tree (PostgreSQL, MySQL):</strong> Updates pages in place. Predictable, fast <strong>reads and range queries</strong>.</li>
+              <li><strong>LSM-Tree (Cassandra, RocksDB):</strong> Appends new writes sequentially into RAM first, then flushes sorted files to disk in batches. Built for <strong>massive write throughput</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAP & ACID vs BASE -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>CAP Theorem &amp; ACID vs. BASE</h3>
+          <span class="sub-pill">The fundamental trade-off of distributed data</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">CAP Theorem (Distributed DBs)</span><span class="card-badge">CP vs AP</span></div>
+            <p class="card-p">When data lives across servers in Delhi and Mumbai connected by a network, network cables <em>will</em> occasionally break (a <strong>Network Partition</strong>). Because <strong>Partition Tolerance (P)</strong> is unavoidable in the real world, you must choose what happens during a split:</p>
+            <ul class="card-list">
+              <li><strong>Choose CP (Consistency + Partition Tolerance):</strong> Refuse requests rather than risk showing stale/wrong data. Essential for <strong>banking &amp; payments</strong> — after withdrawing ₹20,000, no ATM may ever show the old balance.</li>
+              <li><strong>Choose AP (Availability + Partition Tolerance):</strong> Always give the user <em>a</em> response, even if it's a few seconds behind. Ideal for <strong>Instagram likes or WhatsApp counts</strong> — a brief stale count is way better than an error screen.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">ACID vs. BASE</span><span class="card-badge">Banking vs Social Media</span></div>
+            <ul class="card-list">
+              <li><strong>ACID (Strict Correctness — SQL):</strong>
+                <strong>A</strong>tomicity (a transfer either finishes completely or rolls back — no half-done debits),
+                <strong>C</strong>onsistency (if A has ₹100 and B has ₹200, transferring ₹50 still keeps total ₹300),
+                <strong>I</strong>solation (concurrent transactions don't step on each other),
+                <strong>D</strong>urability (committed data survives power cuts).</li>
+              <li><strong>BASE (Massive Scale — NoSQL):</strong>
+                <strong>B</strong>asically <strong>A</strong>vailable (system stays responsive),
+                <strong>S</strong>oft State (values across servers may briefly differ while syncing),
+                <strong>E</strong>ventually Consistent (view count might flicker 10,000 → 10,050 → 10,020, then settle to the true number).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 05 SCALING & DISTRIBUTED SYSTEMS ==================== -->
+    <section class="hld-section" id="scaling" data-sec="scaling" style="--sec-accent:#f43f5e;--sec-soft:rgba(244, 63, 94, 0.11);--sec-border:rgba(244, 63, 94, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">05</span>
+        <h2>Scaling, Microservices &amp; Resilience</h2>
+        <span class="sec-tag">Scaling · Microservices · Message Queues · Rate Limiting · Resilience</span>
+      </header>
+
+      <!-- Vertical vs Horizontal -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Vertical Scaling vs. Horizontal Scaling</h3>
+          <span class="sub-pill">1 Super-Waiter vs. 10 Regular Waiters</span>
+        </div>
+        <p class="lead">
+          Imagine hosting a party for 50 guests. You can either hire one superhuman waiter and push them harder (<strong>Vertical Scaling / Scale-Up</strong>: upgrading one server from 8 GB → 128 GB RAM and 4 → 32 CPU cores), or hire ten normal waiters to share the tables (<strong>Horizontal Scaling / Scale-Out</strong>: adding more servers behind a Load Balancer).
+        </p>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Factor</th><th>Vertical Scaling (Scale-Up)</th><th>Horizontal Scaling (Scale-Out)</th></tr></thead>
+            <tbody>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Growth Ceiling</span></td><td>Hits a hard physical limit — there's only so much RAM/CPU you can fit into one machine. Great and cheaper for early startups.</td><td>Grows almost endlessly by adding more servers across regions — how Amazon, Netflix, and Google scale.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Failure Risk</span></td><td><span class="warn-tag">Single Point of Failure</span> If that one beefy machine crashes, your entire product goes dark.</td><td><span class="good-tag">High Availability</span> If one server crashes, the Load Balancer seamlessly shifts traffic to the survivors.</td></tr>
+              <tr class="op-row"><td class="col-key"><span class="fn-badge">Complexity</span></td><td>Very simple — no Load Balancer needed, almost zero network lag, and all data sits in one place with no sync headaches.</td><td>Requires a Load Balancer, reliable inter-server networking, and careful data/session synchronization across nodes.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Microservices & Message Queues -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Microservices &amp; Message Queues</h3>
+          <span class="sub-pill">Divide work &amp; decouple slow tasks</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">Microservices, Containers &amp; Kubernetes</span><span class="card-badge">Monolith → Modular</span></div>
+            <p class="card-p">A single shop trying to sell groceries, medicines, restaurant meals, and electronics under one roof becomes pure chaos on a weekend rush — that's a <strong>Monolith</strong>. In a <strong>Microservices</strong> setup (like Blinkit), you split the system into focused, independently deployable services: User, Catalog, Cart, Dark-Store Inventory, Payment, Delivery, and Notifications.</p>
+            <ul class="card-list">
+              <li><strong>Containers (Docker):</strong> Pack each service's code and dependencies in its own isolated box so it runs identically everywhere.</li>
+              <li><strong>Kubernetes (K8s):</strong> Automatically orchestrates those containers — if Search gets 10× traffic, K8s scales <em>only</em> Search without wasting money scaling Billing.</li>
+              <li><strong>Right DB per service:</strong> User data can use PostgreSQL while variable product catalogs use MongoDB.</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Message Queues (Async Decoupling)</span><span class="card-badge">Kafka · RabbitMQ · SQS</span></div>
+            <p class="card-p">During an Amazon flash sale, if checkout had to wait synchronously for Inventory, Email, SMS, and Analytics servers to finish, users would stare at a spinning wheel — or fail if the Email server went down.</p>
+            <ul class="card-list">
+              <li><strong>How it works:</strong> The Order service (<strong>Producer</strong>) drops an "Order Placed" event into a FIFO queue and immediately confirms the user's order. Background services (<strong>Consumers</strong>) pull and process events at their own pace.</li>
+              <li><strong>Crash-Proof &amp; Durable:</strong> Messages are saved to disk/SSD (not just RAM) and deleted <em>only</em> after a consumer succeeds. If the Email service crashes for 10 minutes, messages safely wait and catch up when it returns.</li>
+              <li><strong>Dead Letter Queue (DLQ):</strong> <span class="added-pill">+ Added</span> Moves repeatedly failing "poison" messages aside so they don't clog the whole pipeline.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate Limiting -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Rate Limiting — Protecting Systems From Floods</h3>
+          <span class="sub-pill">Returns HTTP 429 "Too Many Requests"</span>
+        </div>
+        <p class="lead">
+          Whether it's a DDoS attacker, a ticket-scalping bot during an IPL sale, or a buggy mobile loop hammering your server, <strong>Rate Limiting</strong> caps how many requests a user/IP can make in a time window. It ensures fairness for real users and stops cloud bills from exploding. Always block excess traffic as early as possible: <strong>CDN/WAF → Load Balancer → API Gateway → App/DB backstop</strong>.
+        </p>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Algorithm</th><th>How It Works (Plain English)</th><th>Strengths &amp; Flaws</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Fixed Window</span></td>
+                <td>Splits time into rigid buckets (e.g., 10 requests per clock minute). Counter resets at <code>:00</code>.</td>
+                <td><span class="warn-tag">Boundary burst bug</span> Super cheap on memory, but a user can fire 10 requests at <code>12:00:59</code> and 10 more at <code>12:01:01</code> — sneaking 20 requests through in 2 seconds!</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Sliding Window Log</span></td>
+                <td>Saves the exact timestamp of every request and counts how many fell within the last rolling N seconds.</td>
+                <td><span class="good-tag">100% accurate</span> Completely fixes the boundary burst exploit, but storing every timestamp eats a lot of RAM at scale.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Sliding Counter</span></td>
+                <td>Smart hybrid: combines the current window's count with a weighted slice of the previous window.</td>
+                <td><span class="good-tag">Best memory/accuracy balance</span> Smooths out edge spikes using almost no memory (tiny approximation trade-off).</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Token Bucket</span></td>
+                <td>Imagine a bucket holding up to 10 tokens that refills steadily (e.g., 2/sec). Every request takes 1 token; empty bucket = <code>429</code>.</td>
+                <td><span class="good-tag">Allows healthy bursts</span> Industry favorite (AWS, Stripe) because real users naturally click in short bursts while still obeying an average rate.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Leaky Bucket</span></td>
+                <td>Requests enter a FIFO queue and trickle out at a strictly constant rate, like water dripping from a hole.</td>
+                <td>Zero bursts allowed — smooths spiky traffic into a steady stream to protect fragile downstream backends. Overflowing requests get dropped.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Resilience Patterns (Added) -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Distributed Resilience Patterns</h3>
+          <span class="added-pill">+ Essential Production Guards</span>
+        </div>
+        <div class="card-grid cols-3">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Circuit Breaker</span><span class="card-badge">Prevent Cascading Failure</span></div>
+            <p class="card-p">Just like an electrical breaker in your home: if the Payment service starts timing out repeatedly, the breaker trips <strong>OPEN</strong> and immediately returns a fast fallback error instead of letting thousands of waiting threads freeze your entire app. After a cool-off, it tests a few requests (<strong>HALF-OPEN</strong>) to auto-heal.</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Exponential Backoff + Jitter</span><span class="card-badge">Smart Retries</span></div>
+            <p class="card-p">If a request fails briefly, don't retry instantly in a tight loop — wait longer each time (<code>1s → 2s → 4s</code>). Add a little random <strong>jitter</strong> (e.g., <code>±200 ms</code>) so 50,000 disconnected clients don't all hammer your recovering server at the exact same millisecond.</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">Idempotency Keys</span><span class="card-badge">No Double Charges</span></div>
+            <p class="card-p">What if a user clicks "Pay ₹500", the Wi-Fi drops, and the app retries? The client attaches a unique <code>idempotency_key</code> (UUID) to the payment request. If the server sees the same key twice, it returns the original result instead of charging the card a second time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 06 SECURITY & AUTH ==================== -->
+    <section class="hld-section" id="security" data-sec="security" style="--sec-accent:#fbbf24;--sec-soft:rgba(251, 191, 36, 0.11);--sec-border:rgba(251, 191, 36, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">06</span>
+        <h2>Security, TLS &amp; Authentication</h2>
+        <span class="sec-tag">SSL/TLS · Session · JWT · OAuth · SSO · 6 Defense Layers</span>
+      </header>
+
+      <!-- SSL/TLS -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>How SSL/TLS Certificates Actually Stop Hackers (MITM)</h3>
+          <span class="sub-pill">SSL is retired; modern HTTPS runs on TLS</span>
+        </div>
+        <p class="lead">
+          Plain HTTP travels across the internet like a postcard anyone can read or edit (a <strong>Man-in-the-Middle attack</strong>). Using one shared secret key (<strong>Symmetric encryption</strong>) fails because a hacker can steal the key while you send it. Using a public/private key pair (<strong>Asymmetric encryption</strong>) is smarter, <em>except</em> a hacker can still intercept the server's public key in transit and swap in their own fake public key! <strong>SSL/TLS Certificates</strong> close this exact loophole using a trusted third party called a <strong>Certificate Authority (CA)</strong> like DigiCert or Let's Encrypt.
+        </p>
+        <div class="flow-steps">
+          <div class="step-card">
+            <span class="step-num">1</span>
+            <div class="step-meta">
+              <span class="step-title">CA Signs the Certificate</span>
+              <span class="step-desc">The server sends its domain &amp; public key to the CA. The CA hashes them (<code>H1</code>) and encrypts <code>H1</code> with the <strong>CA's own private key</strong> to create an unforgeable <strong>digital signature</strong>.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">2</span>
+            <div class="step-meta">
+              <span class="step-title">Server Presents Proof</span>
+              <span class="step-desc">When you open an HTTPS site, the server sends its certificate containing its domain, public key, and the CA's signature.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">3</span>
+            <div class="step-meta">
+              <span class="step-title">Browser Verifies Both Hashes</span>
+              <span class="step-desc">Your browser already trusts major CAs' public keys built into your OS. It decrypts the signature to recover <code>H1</code>, then hashes the received cert itself to get <code>H2</code>.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">4</span>
+            <div class="step-meta">
+              <span class="step-title">Tamper-Proof Connection</span>
+              <span class="step-desc">If <code>H1 == H2</code>, the public key genuinely belongs to that website (a hacker can't forge a matching signature without the CA's private key). Both sides then agree on a fast symmetric session key for the rest of the chat.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auth Comparison -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Session vs. JWT vs. OAuth vs. SSO</h3>
+          <span class="sub-pill">Four auth terms that sound similar but solve different problems</span>
+        </div>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Concept</th><th>Everyday Analogy</th><th>How It Works</th><th>Best Fit &amp; Watch-outs</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">Session</span></td>
+                <td><strong>Cloakroom Token</strong> — only the counter that issued it knows whose bag it matches.</td>
+                <td>You log in once; the server saves your session in its memory/DB and gives your browser a small <code>session_id</code> cookie to attach on future requests.</td>
+                <td>Simple for single-server apps. Behind a Load Balancer, Server 2 won't recognize Server 1's session unless you centralize sessions in a shared store like Redis.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">JWT</span></td>
+                <td><strong>Stamped Boarding Pass</strong> — carries your name, seat, and expiry directly on the ticket.</td>
+                <td>A self-contained token with 3 parts: <strong>Header</strong> (algorithm), <strong>Payload</strong> (user ID, role, expiry), and <strong>Signature</strong> (tamper-proof hash). Any microservice can verify it independently without checking a central session DB.</td>
+                <td><span class="good-tag">Built for distributed APIs</span><br><span class="warn-tag">Catch:</span> Hard to cancel early! If a user logs out or loses admin rights mid-hour, an existing JWT stays valid until it expires (mitigate with short-lived tokens + refresh tokens).</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">OAuth 2.0</span></td>
+                <td><strong>Valet Car Key</strong> — lets the valet park your car, not open your house or office.</td>
+                <td>An <strong>authorization</strong> framework that grants limited, scoped access to a third-party app without ever handing over your password.</td>
+                <td>Letting Spotify pull your Google name &amp; profile photo without ever allowing it to read or delete your Gmail.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">SSO</span></td>
+                <td><strong>One Master ID Card</strong> — opens multiple buildings with one sign-in.</td>
+                <td>An <strong>authentication</strong> setup where logging in once with one identity provider (like Google or company Okta) signs you into multiple separate apps (Netflix, Spotify, Slack).</td>
+                <td>Reduces password fatigue and centralizes login security across an organization or consumer ecosystem.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 6 Security Layers -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>The 6-Layer Security Blueprint ("How Do You Secure IRCTC?")</h3>
+          <span class="sub-pill">Defense in Depth across Client → Server → Database</span>
+        </div>
+        <div class="card-grid cols-3">
+          <div class="concept-card"><div class="card-head"><span class="card-title">1. Authentication</span><span class="card-badge">Verify Identity</span></div><p class="card-p">Confirm <em>who</em> the user is using MFA/OTP, OAuth, JWTs, or passwordless biometrics/passkeys (<strong>WebAuthn</strong>). <strong>Never save raw passwords</strong> — store strong salted hashes (Argon2/bcrypt) and compare hashes on login.</p></div>
+          <div class="concept-card"><div class="card-head"><span class="card-title">2. Authorization</span><span class="card-badge">Scope Permissions</span></div><p class="card-p">Enforce <em>what</em> each role can touch (RBAC). In Uber, Admins, Drivers, and Riders have strictly separate privileges — a driver must never be able to access admin fare-pricing endpoints.</p></div>
+          <div class="concept-card"><div class="card-head"><span class="card-title">3. API Gateway &amp; WAF</span><span class="card-badge">Guard the Door</span></div><p class="card-p">Inspect every request upfront (NGINX, Kong, Cloudflare) to validate tokens, block SQL injection/XSS payloads, and enforce rate limits before bad traffic reaches your database.</p></div>
+          <div class="concept-card"><div class="card-head"><span class="card-title">4. Data Security</span><span class="card-badge">Encrypt at Rest</span></div><p class="card-p">Never store sensitive data or backups in plain text. Encrypt databases and files using standards like <strong>AES-256</strong> and RSA so even a leaked disk or backup stays unreadable.</p></div>
+          <div class="concept-card"><div class="card-head"><span class="card-title">5. Network &amp; Infra</span><span class="card-badge">Encrypt in Transit</span></div><p class="card-p">Use HTTPS/TLS for all network traffic, isolate internal databases inside private <strong>VPCs</strong>, and lock down firewalls so only authorized backend services can reach the DB.</p></div>
+          <div class="concept-card"><div class="card-head"><span class="card-title">6. Monitoring &amp; Fraud</span><span class="card-badge">Active CCTV</span></div><p class="card-p">Continuously watch logs and traffic patterns for anomalies (like a user suddenly jumping from 5 transactions to 1,000/day) to catch breaches and fraud proactively.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 07 DESIGN & MENTAL MODELS ==================== -->
+    <section class="hld-section" id="design" data-sec="design" style="--sec-accent:#2dd4bf;--sec-soft:rgba(45, 212, 191, 0.11);--sec-border:rgba(45, 212, 191, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">07</span>
+        <h2>Architecture, SOLID &amp; Mental Models</h2>
+        <span class="sec-tag">HLD vs LLD · SOLID Principles · Restaurant Analogy</span>
+      </header>
+
+      <!-- HLD vs LLD -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>HLD vs. LLD — Zoomed-Out Map vs. Zoomed-In Code</h3>
+        </div>
+        <p class="lead">
+          HLD and LLD aren't separate worlds — <strong>LLD is simply zooming inside one box of your HLD diagram</strong>. Take <strong>IRCTC</strong> as an example:
+        </p>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">HLD — High-Level Design</span><span class="card-badge">The Big Picture</span></div>
+            <p class="card-p">Focuses on major system blocks and how traffic flows between them: Authentication, Train Search, Seat Booking, Tatkal, Payment, Cancellation, and Notification microservices — connected via Load Balancers, Redis cache, SQL/NoSQL databases, and Kafka queues.</p>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">LLD — Low-Level Design</span><span class="card-badge">Implementation Details</span></div>
+            <p class="card-p">Focuses on classes, schemas, and exact logic inside a service: <code>User</code>, <code>Train</code>, <code>Coach</code>, <code>Seat</code>, and <code>PNR</code> classes; design patterns like <strong>Factory</strong> (for UPI/Card/Wallet payments) and <strong>Singleton</strong> (shared connection); locking code to prevent double-booking; waitlist transitions; and time-based cancellation refund rules.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOLID -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>SOLID Principles — Writing Code That Doesn't Break When It Grows</h3>
+          <span class="sub-pill">Remodel one room without knocking down the whole house</span>
+        </div>
+        <div class="table-card">
+          <table class="ops-table">
+            <thead><tr><th>Principle</th><th>What It Means Simply</th><th>Relatable Example</th></tr></thead>
+            <tbody>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">S · Single Responsibility</span></td>
+                <td>Every class should have <strong>one clear job</strong> and one reason to change.</td>
+                <td>Don't stuff user signup, email sending, and activity logging into one giant class. Split them into <code>Registration</code>, <code>Notification</code>, and <code>ActivityLog</code> so editing emails never risks breaking signup.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">O · Open / Closed</span></td>
+                <td><strong>Open for extension</strong> (adding new features), <strong>closed for modification</strong> (don't rewrite working code).</td>
+                <td>Instead of endlessly adding <code>else if (type == "wallet")</code> inside a fragile <code>Payment</code> class, define a <code>Payment</code> interface and simply create new <code>UPIPayment</code> or <code>WalletPayment</code> classes.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">L · Liskov Substitution</span></td>
+                <td>A child class must work cleanly <strong>anywhere its parent is expected</strong>, without surprises.</td>
+                <td>If <code>Bird</code> has <code>fly()</code>, <code>Sparrow</code> works fine — but <code>Penguin</code> or <code>Ostrich</code> breaks the promise! Same with putting <code>BikeDelivery</code> under a <code>HeavyFurnitureDelivery</code> parent class.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">I · Interface Segregation</span></td>
+                <td>Keep interfaces small and focused so classes aren't forced to implement useless methods.</td>
+                <td>Modern smart-TV remotes beat old 60-button remotes. Don't force a basic printer to implement <code>scan()</code> and <code>fax()</code> — split into clean <code>Printable</code>, <code>Scannable</code>, and <code>Faxable</code> interfaces.</td>
+              </tr>
+              <tr class="op-row">
+                <td class="col-key"><span class="fn-badge">D · Dependency Inversion</span></td>
+                <td>High-level business logic should depend on <strong>abstractions</strong>, not hardcoded third-party vendors.</td>
+                <td>Have your Order service talk to a generic <code>PaymentGateway</code> interface instead of directly hardcoding Razorpay. If you later switch to Stripe or PayPal, you swap one adapter without touching core order logic.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Restaurant Mental Model -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>The Restaurant Mental Model — Everything Connected</h3>
+        </div>
+        <p class="lead">If you ever want to recall the entire flow of a distributed web application in 15 seconds, just picture dining at a popular restaurant chain:</p>
+        <div class="arch-box"><span class="hi">Frontend</span> = The menu &amp; booking app UI        <span class="dim">|</span>  <span class="hi">DNS</span> = Looking up the restaurant's street address
+<span class="hi">CDN</span> = Visiting the branch closest to you      <span class="dim">|</span>  <span class="hi">SSL &amp; Firewalls</span> = Entry guards, OTP &amp; payment PIN
+<span class="hi">Load Balancer</span> = Valet assigning parking spots <span class="dim">|</span>  <span class="hi">API Gateway</span> = Manager + Waiter bridging you to kitchen
+<span class="hi">Cache</span> = Pre-made mocktail (served instantly)  <span class="dim">|</span>  <span class="hi">Database</span> = Dish cooked from scratch (slower, authoritative)
+<span class="hi">Microservices</span> = Separate Indian/Chinese chefs <span class="dim">|</span>  <span class="hi">Horizontal Scaling</span> = Opening more branches across cities
+<span class="hi">Monitoring &amp; Logs</span> = CCTV &amp; kitchen audits     <span class="dim">|</span>  <span class="hi">Feedback Loop</span> = Post-meal ratings to improve service</div>
+      </div>
+    </section>
+
+    <!-- ==================== 08 CASE STUDIES & PLAYBOOK ==================== -->
+    <section class="hld-section" id="cases" data-sec="cases" style="--sec-accent:#818cf8;--sec-soft:rgba(129, 140, 248, 0.11);--sec-border:rgba(129, 140, 248, 0.28)">
+      <header class="sec-header">
+        <span class="sec-num">08</span>
+        <h2>Real-World Case Studies &amp; Interview Playbook</h2>
+        <span class="sec-tag">Instagram · IRCTC Tatkal · 4-Step Framework · Latency Anchors</span>
+      </header>
+
+      <!-- Case Study 1: Instagram -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Case Study 1: Designing Instagram (500M+ Users, Media &amp; Feeds)</h3>
+          <span class="added-pill">+ Celebrity Fan-Out Explained</span>
+        </div>
+        <p class="lead">
+          Instagram combines almost every HLD building block at massive scale. Traffic enters through <strong>Global DNS + CDN Edges</strong>, passes through a <strong>WAF, Rate Limiter, and API Gateway</strong> (using session tokens after login), and splits across specialized microservices using three API styles: <strong>REST</strong> for uploads/standard actions, <strong>GraphQL</strong> for pulling exact profile fields, and <strong>WebSockets</strong> for DMs, Live video, and instant notifications.
+        </p>
+
+        <div class="card-grid cols-3">
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">1. Uploading a Reel</span><span class="card-badge">Async Media Pipeline</span></div>
+            <p class="card-p">Raw phone videos are huge and unoptimized. After upload via REST, an async pipeline runs:</p>
+            <ul class="card-list">
+              <li><strong>Safety Check:</strong> Scans for spam, nudity, or policy violations.</li>
+              <li><strong>Transcoding:</strong> Converts video into 360p, 480p, HD, and 4K copies for smooth playback on any mobile network, plus detects audio tracks.</li>
+              <li><strong>Publish:</strong> Saves the video files to <strong>Object Storage (S3)</strong>, pushes them onto the <strong>CDN</strong>, and stores the reel ID + URL in the database.</li>
+            </ul>
+          </div>
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">2. Feed Fan-Out &amp; Celebrities</span><span class="card-badge">Hybrid Push / Pull</span></div>
+            <p class="card-p">How does a new post appear in followers' feeds quickly — without melting the system when Virat Kohli (300M followers) posts?</p>
+            <ul class="card-list">
+              <li><strong>Normal Users (Push / Fan-Out on Write):</strong> Background workers push the new post ID into each follower's pre-built Redis feed, making feed loading instant.</li>
+              <li><strong>Celebrities (Pull / Fan-Out on Read):</strong> Writing 300M feed entries is way too slow. Instead, celebrity posts are fetched and merged live when a follower opens the app!</li>
+              <li><strong>Instant Likes:</strong> The heart turns red immediately in your UI while the total like count updates asynchronously in the background (Write-Back / BASE).</li>
+            </ul>
+          </div>
+          <div class="concept-card">
+            <div class="card-head"><span class="card-title">3. Recommendation Engine</span><span class="card-badge">4-Stage ML Funnel</span></div>
+            <p class="card-p">All engagement signals (5-second skip vs. full watch + like + comment) flow into a <strong>Data Lake</strong> powering 4 stages:</p>
+            <ul class="card-list">
+              <li><strong>Retrieval:</strong> Pull candidate reels matching user interests.</li>
+              <li><strong>Filtering:</strong> Drop spam, already-watched, or muted creators.</li>
+              <li><strong>Ranking:</strong> Score posts by predicted watch time &amp; engagement.</li>
+              <li><strong>Re-ranking:</strong> Deliberately mix in variety so one viral creator doesn't flood every single slot in your feed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case Study 2: IRCTC Tatkal -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>Case Study 2: IRCTC Tatkal — Surviving a 10–20× Traffic Surge</h3>
+          <span class="sub-pill">Scalability + Strict Concurrency Control</span>
+        </div>
+        <p class="lead">
+          At 10:00 AM sharp, lakhs of passengers and ticket agents rush IRCTC for a tiny pool of Tatkal seats. The exact same design pattern powers Amazon Big Billion Days and Hotstar IPL finals, built around two pillars: <strong>Auto-Scaling</strong> (absorbing the wave) and <strong>Locking</strong> (ensuring two people never book the same seat).
+        </p>
+        <div class="flow-steps">
+          <div class="step-card">
+            <span class="step-num">1</span>
+            <div class="step-meta">
+              <span class="step-title">Offload Static &amp; Auto-Scale</span>
+              <span class="step-desc">Train numbers and timetables are served straight from the <strong>CDN</strong>. Ahead of 10:00 AM, auto-scaling spins up extra backend servers (e.g., 10 → 30 instances) behind the Load Balancer.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">2</span>
+            <div class="step-meta">
+              <span class="step-title">Stateless Gateway &amp; Bot Defense</span>
+              <span class="step-desc">A <strong>stateless API Gateway</strong> verifies logins and applies strict <strong>rate limiting</strong> so automated dealer bots cannot flood out normal travelers.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">3</span>
+            <div class="step-meta">
+              <span class="step-title">Redis Shields the Reads</span>
+              <span class="step-desc">Most early traffic is people refreshing seat availability. A fast <strong>Redis cluster</strong> serves those reads so the primary SQL database isn't crushed before booking even begins.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">4</span>
+            <div class="step-meta">
+              <span class="step-title">Seat Lock (10 Seats vs 10k Buyers)</span>
+              <span class="step-desc">Everyone can <em>read</em> availability simultaneously, but booking acquires a <strong>timed lock</strong> on the seat (ordered by timestamp or priority rules like senior citizens). Nobody else can grab it while locked.</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">5</span>
+            <div class="step-meta">
+              <span class="step-title">Pay, Rollback &amp; Async Ticket</span>
+              <span class="step-desc">If payment completes in time, the ACID booking commits and SMS/Email confirmations go out asynchronously via <strong>Kafka/RabbitMQ</strong>. If payment fails or times out, the transaction rolls back and the seat lock releases for the next buyer.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview Playbook & Numbers (Added) -->
+      <div class="subgroup">
+        <div class="subgroup-header">
+          <h3>HLD Interview Playbook &amp; Numbers Worth Remembering</h3>
+          <span class="added-pill">+ Quick Prep Guide</span>
+        </div>
+        <div class="card-grid cols-2">
+          <div class="concept-card accent-left">
+            <div class="card-head"><span class="card-title">How to Structure a 45-Min HLD Interview</span><span class="card-badge">4 Clear Steps</span></div>
+            <ul class="card-list">
+              <li><strong>1. Clarify Requirements (5 min):</strong> Don't jump straight to drawing! Agree on the top 3–4 user features and key non-functional goals (scale, read vs. write ratio, CP vs. AP, latency target).</li>
+              <li><strong>2. Quick Sizing (5 min):</strong> Rough back-of-the-envelope numbers — handy shortcut: <code>1 million requests/day ≈ 12 requests/sec (QPS)</code>, with peak traffic usually 3–10× average.</li>
+              <li><strong>3. High-Level Architecture (15 min):</strong> Sketch the full happy path: Client → CDN/LB → API Gateway → Microservices → Cache/DB/Queue, plus 2–3 core APIs and database choices.</li>
+              <li><strong>4. Deep Dive &amp; Bottlenecks (20 min):</strong> Proactively call out weak spots — single points of failure, sharding keys, celebrity/hot-key skew, locking under contention, and observability.</li>
+            </ul>
+          </div>
+          <div class="table-card" style="margin-bottom:0">
+            <table class="ops-table">
+              <thead><tr><th>Operation / SLA</th><th>Ballpark Number</th><th>Why It Matters in Design</th></tr></thead>
+              <tbody>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">RAM Lookup</span></td><td><strong>~100 ns</strong></td><td>Why Redis &amp; in-memory caching feel instantaneous.</td></tr>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">SSD Read</span></td><td><strong>~100 µs (0.1 ms)</strong></td><td>~1,000× slower than RAM, ~100× faster than HDD.</td></tr>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">Same-DC Network</span></td><td><strong>~0.5 ms</strong></td><td>Cost of one microservice calling Redis or another local service.</td></tr>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">HDD Disk Seek</span></td><td><strong>~10 ms</strong></td><td>Why unindexed disk scans collapse under heavy concurrency.</td></tr>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">Cross-Continent</span></td><td><strong>~150 ms</strong></td><td>Speed-of-light delay — why CDNs and regional data centers exist.</td></tr>
+                <tr class="op-row"><td class="col-key"><span class="fn-badge">99.9% vs 99.99%</span></td><td><strong>8.7 hrs vs 52 min/yr</strong></td><td>Adding just one extra "9" of uptime slashes allowed downtime by 10×.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (() => {
+      const pills = [...document.querySelectorAll('.pill')];
+      const sections = [...document.querySelectorAll('.hld-section')];
+
+      function setFilter(filter) {
+        pills.forEach(p => p.classList.toggle('active', p.dataset.filter === filter));
+        sections.forEach(sec => {
+          sec.classList.toggle('is-hidden', filter !== 'all' && sec.dataset.sec !== filter);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      document.getElementById('filterPills').addEventListener('click', e => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        setFilter(pill.dataset.filter);
+      });
+    })();
+  </script>
+</body>
+</html>
