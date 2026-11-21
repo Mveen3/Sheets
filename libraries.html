@@ -65,14 +65,17 @@
       width: 100%;
       display: flex;
       align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      padding: 10px clamp(16px, 2.2vw, 36px);
+      gap: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 7px clamp(12px, 2vw, 36px);
       background: rgba(10, 14, 20, 0.88);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
+    .topbar::-webkit-scrollbar { display: none; }
 
     .top-title {
       font-size: 15px;
@@ -93,7 +96,8 @@
       display: flex;
       align-items: center;
       gap: 7px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
     }
 
     .pill {
@@ -363,6 +367,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
     }
 

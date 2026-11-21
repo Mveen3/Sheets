@@ -54,7 +54,7 @@
     }
   </style>
 </head>
-<body class="antialiased selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col justify-center py-10 sm:py-16 px-4 sm:px-6 lg:px-8 relative bg-dev-pattern">
+<body class="antialiased selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col justify-start sm:justify-center py-8 sm:py-14 px-4 sm:px-6 lg:px-8 relative bg-dev-pattern">
 
   <!-- ========================================================================= -->
   <!-- DEVELOPER GRAPHICS & AMBIENT GRAFFITI BACKGROUND (Non-intrusive, subtle) -->
@@ -165,19 +165,19 @@
     </header>
 
     <!-- Sheets Grid (Responsive 2x2 Grid that Fills the Viewport Gracefully) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 
       <!-- Sheet Box 1: DSA -->
       <a
         href="./dsa.html"
-        class="sheet-box group flex flex-col justify-between p-7 sm:p-8 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-indigo-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(99,102,241,0.28)] min-h-[210px]"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-indigo-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(99,102,241,0.28)] min-h-[195px] sm:min-h-[210px] active:scale-[0.99] transition-all"
       >
         <div>
           <!-- Icon & Corner Arrow -->
-          <div class="flex items-center justify-between mb-5">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400 group-hover:scale-105 group-hover:bg-indigo-600/25 transition-all">
+          <div class="flex items-center justify-between mb-4 sm:mb-5">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-indigo-600/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400 group-hover:scale-105 group-hover:bg-indigo-600/25 transition-all">
               <!-- Graph / Network Icon -->
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <circle cx="6" cy="6" r="2.4" />
                 <circle cx="18" cy="7" r="2.4" />
                 <circle cx="7" cy="18" r="2.4" />
@@ -195,12 +195,12 @@
           </div>
 
           <!-- Title -->
-          <h2 class="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
+          <h2 class="text-lg sm:text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
             DSA
           </h2>
 
           <!-- One-line Description -->
-          <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-slate-400 mt-1.5 sm:mt-2 leading-relaxed">
             Topic-wise problem tracker with patterns, insights, and progress tracking.
           </p>
         </div>
@@ -209,14 +209,14 @@
       <!-- Sheet Box 2: Libraries -->
       <a
         href="./libraries.html"
-        class="sheet-box group flex flex-col justify-between p-7 sm:p-8 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-cyan-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(56,189,248,0.28)] min-h-[210px]"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-cyan-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(56,189,248,0.28)] min-h-[195px] sm:min-h-[210px] active:scale-[0.99] transition-all"
       >
         <div>
           <!-- Icon & Corner Arrow -->
-          <div class="flex items-center justify-between mb-5">
-            <div class="w-12 h-12 rounded-2xl bg-cyan-600/15 border border-cyan-500/25 flex items-center justify-center text-cyan-400 group-hover:scale-105 group-hover:bg-cyan-600/25 transition-all">
+          <div class="flex items-center justify-between mb-4 sm:mb-5">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-cyan-600/15 border border-cyan-500/25 flex items-center justify-center text-cyan-400 group-hover:scale-105 group-hover:bg-cyan-600/25 transition-all">
               <!-- Code / Terminal Icon -->
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <polyline points="16 18 22 12 16 6"></polyline>
                 <polyline points="8 6 2 12 8 18"></polyline>
               </svg>
@@ -231,12 +231,12 @@
           </div>
 
           <!-- Title -->
-          <h2 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+          <h2 class="text-lg sm:text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
             Libraries
           </h2>
 
           <!-- One-line Description -->
-          <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-slate-400 mt-1.5 sm:mt-2 leading-relaxed">
             Cheat sheet and quick syntax reference for NumPy, Pandas, Scikit-learn, PyTorch, and Matplotlib.
           </p>
         </div>
@@ -245,14 +245,14 @@
       <!-- Sheet Box 3: HLD -->
       <a
         href="./hld.html"
-        class="sheet-box group flex flex-col justify-between p-7 sm:p-8 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-emerald-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(16,185,129,0.28)] min-h-[210px]"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-emerald-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(16,185,129,0.28)] min-h-[195px] sm:min-h-[210px] active:scale-[0.99] transition-all"
       >
         <div>
           <!-- Icon & Corner Arrow -->
-          <div class="flex items-center justify-between mb-5">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-600/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 group-hover:scale-105 group-hover:bg-emerald-600/25 transition-all">
+          <div class="flex items-center justify-between mb-4 sm:mb-5">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-600/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 group-hover:scale-105 group-hover:bg-emerald-600/25 transition-all">
               <!-- System Architecture / Distributed Nodes Icon -->
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <rect x="4" y="4" width="6" height="6" rx="1.5"></rect>
                 <rect x="14" y="4" width="6" height="6" rx="1.5"></rect>
                 <rect x="9" y="14" width="6" height="6" rx="1.5"></rect>
@@ -269,12 +269,12 @@
           </div>
 
           <!-- Title -->
-          <h2 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
+          <h2 class="text-lg sm:text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
             HLD
           </h2>
 
           <!-- One-line Description -->
-          <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-slate-400 mt-1.5 sm:mt-2 leading-relaxed">
             System design guide covering networking, load balancing, caching, APIs, and distributed architectures.
           </p>
         </div>
@@ -283,14 +283,14 @@
       <!-- Sheet Box 4: Python OOP -->
       <a
         href="./python_oops.html"
-        class="sheet-box group flex flex-col justify-between p-7 sm:p-8 rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-amber-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(245,158,11,0.28)] min-h-[210px]"
+        class="sheet-box group flex flex-col justify-between p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-slate-900/70 hover:bg-slate-900/95 border border-slate-800/80 hover:border-amber-500/50 backdrop-blur-xl shadow-xl hover:shadow-[0_0_35px_-5px_rgba(245,158,11,0.28)] min-h-[195px] sm:min-h-[210px] active:scale-[0.99] transition-all"
       >
         <div>
           <!-- Icon & Corner Arrow -->
-          <div class="flex items-center justify-between mb-5">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-400 group-hover:scale-105 group-hover:bg-amber-500/25 transition-all">
+          <div class="flex items-center justify-between mb-4 sm:mb-5">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-400 group-hover:scale-105 group-hover:bg-amber-500/25 transition-all">
               <!-- OOP 3D Isometric Cube / Object Icon -->
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
@@ -304,12 +304,12 @@
           </div>
 
           <!-- Title -->
-          <h2 class="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
+          <h2 class="text-lg sm:text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
             Python OOP
           </h2>
 
           <!-- One-line Description -->
-          <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-slate-400 mt-1.5 sm:mt-2 leading-relaxed">
             Complete OOP guide covering classes, dunder methods, encapsulation, inheritance, and patterns.
           </p>
         </div>
